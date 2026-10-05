@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telemetry Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Idle & Media Views -->
+    <div id="base-layer">
+        <div id="view-idle" class="screen active">
+            <div class="idle-pulse">AWAITING TELEMETRY</div>
+        </div>
+
+        <div id="view-media" class="screen">
+            <div id="media-source" class="source-label">SPOTIFY</div>
+            <h1 id="media-title" class="primary-text">Song Title</h1>
+            <h2 id="media-artist" class="secondary-text">Artist Name</h2>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notification-popup" class="popup">
+        <div class="popup-content">
+            <div id="notif-source" class="source-label">WHATSAPP</div>
+            <h2 id="notif-title" class="primary-text popup-title">Alert</h2>
+            <p id="notif-body" class="secondary-text popup-body">Message Details</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

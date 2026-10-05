@@ -1,0 +1,99 @@
+body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* --- BASE LAYER (Media & Idle) --- */
+#base-layer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.screen {
+    position: absolute;
+    background: #1e1e1e;
+    padding: 2rem 4rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+}
+
+.screen.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- POPUP LAYER (Notifications) --- */
+#notification-popup {
+    position: absolute;
+    top: 40px; 
+    left: 50%;
+    transform: translateX(-50%) translateY(-150%); 
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid #333;
+    padding: 1.5rem 3rem;
+    border-radius: 16px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
+    text-align: center;
+    opacity: 0;
+    z-index: 100;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+}
+
+#notification-popup.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* --- TYPOGRAPHY & COLORS --- */
+.source-label {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+    transition: color 0.4s ease, text-shadow 0.4s ease;
+}
+
+.primary-text { font-size: 2.5rem; font-weight: bold; margin: 0; }
+.secondary-text { font-size: 1.5rem; font-weight: bold; margin: 0; color: #aaaaaa; }
+
+.popup-title { font-size: 1.8rem; }
+.popup-body { font-size: 1.2rem; font-weight: normal; margin-top: 0.5rem; }
+
+/* --- BRANDING STYLES --- */
+.brand-spotify { color: #1db954; text-shadow: 0 0 12px rgba(29, 185, 84, 0.4); }
+.brand-youtube { color: #ff0000; text-shadow: 0 0 12px rgba(255, 0, 0, 0.4); }
+.brand-twitch { color: #9146ff; text-shadow: 0 0 12px rgba(145, 70, 255, 0.4); }
+.brand-whatsapp { color: #25d366; text-shadow: 0 0 12px rgba(37, 211, 102, 0.4); }
+.brand-vlc { color: #ff8800; text-shadow: 0 0 12px rgba(255, 136, 0, 0.4); }
+.brand-media-player { color: #00a4ef; text-shadow: 0 0 12px rgba(0, 164, 239, 0.4); }
+.brand-default { color: #fb542b; text-shadow: 0 0 12px rgba(251, 84, 43, 0.4); }
+
+/* --- IDLE ANIMATION --- */
+.idle-pulse {
+    font-size: 1.5rem;
+    color: #555555;
+    letter-spacing: 4px;
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+}

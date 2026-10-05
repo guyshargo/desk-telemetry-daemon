@@ -13,7 +13,7 @@ def is_local_player(app_id):
     return any(player in app for player in ["vlc", "movies"])
 
 async def evaluate_local_state():
-    """Sweeps only local desktop apps. Web idle is now handled purely by Tampermonkey."""
+    """Sweeps only local desktop apps"""
     global local_currently_playing
     playing_session = None
 

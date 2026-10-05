@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-from core.broker import event_queue
+from core.broker import publish_event
 
 # APIRouter allows us to split FastAPI routes across multiple files
 router = APIRouter()
@@ -8,7 +8,7 @@ router = APIRouter()
 async def receive_webhook(request: Request):
     """Catches media and notification events from Tampermonkey."""
     data = await request.json()
-    await event_queue.put({
+    await publish_event("web", {
         "event_type": data.get("event_type", "notification"), 
         "source": data.get("source", "unknown"),
         "title": data.get("title", "New Alert"),

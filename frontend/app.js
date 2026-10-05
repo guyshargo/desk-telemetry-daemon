@@ -14,7 +14,6 @@ function getBrandClass(source) {
     if (s.includes("twitch")) return "brand-twitch";
     if (s.includes("whatsapp")) return "brand-whatsapp";
     if (s.includes("vlc")) return "brand-vlc";
-    if (s.includes("media_player")) return "brand-media-player";
     return "brand-default";
 }
 

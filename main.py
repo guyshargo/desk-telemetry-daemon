@@ -4,16 +4,15 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 
 from core.broker import event_queue
-from producers.windows_media import start_media_listener
 from producers.web_media import router as web_media_router
+from producers.vlc_media import poll_vlc_state
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Boot up the native Windows OS media listener
-    loop = asyncio.get_running_loop()
-    await start_media_listener(loop)
-    
+
+    # Boot up the standalone VLC monitor
+    asyncio.create_task(poll_vlc_state())
     yield  
 
 

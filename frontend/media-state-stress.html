@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media State Stress Scenarios</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            display: block;
+            height: auto;
+            min-height: 100vh;
+            overflow: auto;
+        }
+
+        .stress-report {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .scenario {
+            max-width: calc(100vw - 2rem);
+        }
+
+        .scenario-label {
+            margin: 0 0 0.5rem;
+        }
+
+        .fixture-shell {
+            display: flex;
+            width: 320px;
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        .fixture-shell--wide {
+            width: 960px;
+        }
+
+        .fixture-shell--squeezed {
+            width: 320px;
+        }
+
+        .media-frame {
+            position: relative;
+            flex: 1 1 auto;
+            min-width: 0;
+            height: 220px;
+        }
+
+        .fixture-shell--squeezed .media-frame {
+            flex-basis: 0;
+        }
+
+        .fixture-sibling {
+            display: none;
+            flex: 0 0 88px;
+            align-self: stretch;
+            margin-left: 0.5rem;
+        }
+
+        .fixture-shell--squeezed .fixture-sibling {
+            display: block;
+        }
+
+        .media-frame .screen {
+            inset: 0;
+            width: 100%;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body data-variant="signal">
+    <main class="stress-report" aria-label="Media state stress scenarios">
+        <section class="scenario">
+            <h2 class="scenario-label">150-character YouTube title · 320px container</h2>
+            <div class="fixture-shell">
+                <div class="media-frame">
+                    <div class="screen active">
+                        <div class="media-content">
+                            <div class="source-label"></div>
+                            <h1 class="primary-text"></h1>
+                            <h2 class="secondary-text"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scenario">
+            <h2 class="scenario-label">150-character YouTube title · squeezed by flex sibling</h2>
+            <div class="fixture-shell fixture-shell--squeezed">
+                <div class="media-frame">
+                    <div class="screen active">
+                        <div class="media-content">
+                            <div class="source-label"></div>
+                            <h1 class="primary-text"></h1>
+                            <h2 class="secondary-text"></h2>
+                        </div>
+                    </div>
+                </div>
+                <aside class="fixture-sibling" aria-hidden="true"></aside>
+            </div>
+        </section>
+
+        <section class="scenario">
+            <h2 class="scenario-label">150-character YouTube title · 960px wide container</h2>
+            <div class="fixture-shell fixture-shell--wide">
+                <div class="media-frame">
+                    <div class="screen active">
+                        <div class="media-content">
+                            <div class="source-label"></div>
+                            <h1 class="primary-text"></h1>
+                            <h2 class="secondary-text"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scenario">
+            <h2 class="scenario-label">Missing source name · 320px container</h2>
+            <div class="fixture-shell">
+                <div class="media-frame">
+                    <div class="screen active">
+                        <div class="media-content">
+                            <div class="source-label"></div>
+                            <h1 class="primary-text"></h1>
+                            <h2 class="secondary-text"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scenario">
+            <h2 class="scenario-label">Missing source name · squeezed by flex sibling</h2>
+            <div class="fixture-shell fixture-shell--squeezed">
+                <div class="media-frame">
+                    <div class="screen active">
+                        <div class="media-content">
+                            <div class="source-label"></div>
+                            <h1 class="primary-text"></h1>
+                            <h2 class="secondary-text"></h2>
+                        </div>
+                    </div>
+                </div>
+                <aside class="fixture-sibling" aria-hidden="true"></aside>
+            </div>
+        </section>
+
+        <section class="scenario">
+            <h2 class="scenario-label">Missing source name · 960px wide container</h2>
+            <div class="fixture-shell fixture-shell--wide">
+                <div class="media-frame">
+                    <div class="screen active">
+                        <div class="media-content">
+                            <div class="source-label"></div>
+                            <h1 class="primary-text"></h1>
+                            <h2 class="secondary-text"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const longTitle = "A Walk Through the Moonlit City: "
+            .padEnd(150, "Music, lights, and quiet streets after midnight. ")
+            .slice(0, 150);
+        const fixtures = [
+            { source: "YouTube", title: longTitle, artist: "Tycho" },
+            { title: "Midnight City", artist: "M83" }
+        ];
+
+        document.querySelectorAll(".scenario").forEach((scenario, index) => {
+            const fixture = fixtures[Math.floor(index / 3)];
+            const frame = scenario.querySelector(".media-frame");
+            const source = fixture.source;
+            const sourceLabel = frame.querySelector(".source-label");
+            sourceLabel.innerText = source;
+            const sourceKey = (source || "").toLowerCase();
+            const brand = sourceKey.includes("youtube") ? "brand-youtube" : "brand-default";
+            sourceLabel.classList.add(brand);
+            frame.querySelector(".primary-text").innerText = fixture.title;
+            frame.querySelector(".secondary-text").innerText = fixture.artist;
+        });
+    </script>
+</body>
+</html>

@@ -1,8 +1,9 @@
 import asyncio
+from core.broker import publish_event
+from core.plugin import TelemetryPlugin
 import urllib.request
 import base64
 import json
-from core.broker import publish_event
 
 vlc_currently_playing = False
 last_vlc_title = ""
@@ -21,49 +22,64 @@ def fetch_vlc_status():
     except Exception:
         return None
 
-async def poll_vlc_state():
-    global vlc_currently_playing, last_vlc_title
-    
-    while True:
-        vlc_data = await asyncio.to_thread(fetch_vlc_status)
-        
-        if vlc_data:
-            state = vlc_data.get("state")
+
+class VLCPlugin(TelemetryPlugin):
+    def __init__(self):
+        self._task = None
+
+    async def start(self):
+        # Start poll_vlc_state loop as a tracked task
+        self._task = asyncio.create_task(self.poll_vlc_state())
+
+    async def stop(self):
+        if self._task:
+            self._task.cancel()
+
+    async def poll_vlc_state(self):
+        while True:
+            vlc_data = await asyncio.to_thread(fetch_vlc_status)
             
-            if state == "playing":
-                meta = vlc_data.get("information", {}).get("category", {}).get("meta", {})
-                title = meta.get("title") or meta.get("filename") or "Unknown Video"
+            if vlc_data:
+                state = vlc_data.get("state")
                 
-                # Only push to the dashboard if a NEW video started, or if it resumed from paused
-                if not vlc_currently_playing or title != last_vlc_title:
-                    vlc_currently_playing = True
-                    last_vlc_title = title
+                if state == "playing":
+                    meta = vlc_data.get("information", {}).get("category", {}).get("meta", {})
+                    title = meta.get("title") or meta.get("filename") or "Unknown Video"
                     
+                    # Only push to the dashboard if a NEW video started, or if it resumed from paused
+                    if not vlc_currently_playing or title != last_vlc_title:
+                        vlc_currently_playing = True
+                        last_vlc_title = title
+                        
+                        await publish_event("vlc", {
+                            "event_type": "media",
+                            "source": "vlc",
+                            "title": title,
+                            "body": ""
+                        })
+                    
+                elif vlc_currently_playing and state in ["paused", "stopped"]:
+                    # Clear the dashboard when the video is paused
+                    vlc_currently_playing = False
                     await publish_event("vlc", {
-                        "event_type": "media",
-                        "source": "vlc",
-                        "title": title,
+                        "event_type": "idle",
+                        "source": "system",
+                        "title": "",
                         "body": ""
                     })
-                
-            elif vlc_currently_playing and state in ["paused", "stopped"]:
-                # Instantly clear the dashboard when the video is paused
-                vlc_currently_playing = False
-                await publish_event("vlc", {
-                    "event_type": "idle",
-                    "source": "system",
-                    "title": "",
-                    "body": ""
-                })
-        else:
-            # Clear the dashboard if the VLC program is completely closed
-            if vlc_currently_playing:
-                vlc_currently_playing = False
-                await publish_event("vlc", {
-                    "event_type": "idle",
-                    "source": "system",
-                    "title": "",
-                    "body": ""
-                })
-                
-        await asyncio.sleep(2)
+            else:
+                # Clear the dashboard if the VLC program is completely closed
+                if vlc_currently_playing:
+                    vlc_currently_playing = False
+                    await publish_event("vlc", {
+                        "event_type": "idle",
+                        "source": "system",
+                        "title": "",
+                        "body": ""
+                    })
+                    
+            await asyncio.sleep(2)
+
+
+def register_plugin():
+    return VLCPlugin()

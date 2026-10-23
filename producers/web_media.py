@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from core.broker import publish_event
+from core.plugin import TelemetryPlugin
 
-# APIRouter allows us to split FastAPI routes across multiple files
 router = APIRouter()
 
 @router.post("/webhook")
@@ -15,3 +15,12 @@ async def receive_webhook(request: Request):
         "body": data.get("body", "")
     })
     return {"status": "queued"}
+
+class WebMediaPlugin(TelemetryPlugin):
+    @property
+    def router(self):
+        return router  # Expose the APIRouter to the core loader
+
+def register_plugin():
+    """Entry point for loader."""
+    return WebMediaPlugin()

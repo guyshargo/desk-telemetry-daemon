@@ -6,7 +6,7 @@
     <title>Telemetry Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-variant="signal">
 
     <!-- Idle & Media Views -->
     <div id="base-layer">
@@ -15,20 +15,34 @@
         </div>
 
         <div id="view-media" class="screen">
-            <div id="media-source" class="source-label">SPOTIFY</div>
-            <h1 id="media-title" class="primary-text">Song Title</h1>
-            <h2 id="media-artist" class="secondary-text">Artist Name</h2>
+            <div class="media-content">
+                <div id="media-source" class="source-label">SPOTIFY</div>
+                <h1 id="media-title" class="primary-text">Song Title</h1>
+                <h2 id="media-artist" class="secondary-text">Artist Name</h2>
+            </div>
         </div>
     </div>
 
     <!-- Notifications -->
-    <div id="notification-popup" class="popup">
+    <div id="notification-popup" class="popup" role="status" aria-live="polite" aria-atomic="true">
         <div class="popup-content">
-            <div id="notif-source" class="source-label">WHATSAPP</div>
-            <h2 id="notif-title" class="primary-text popup-title">Alert</h2>
-            <p id="notif-body" class="secondary-text popup-body">Message Details</p>
+            <span id="notif-logo" class="notification-logo brand-whatsapp" aria-hidden="true">WA</span>
+            <h2 id="notif-title" class="primary-text popup-title" title="Alert">Alert</h2>
+            <p id="notif-body" class="secondary-text popup-body" title="Message Details">Message Details</p>
         </div>
     </div>
+
+    <nav class="state-switcher" aria-label="Mock states">
+        <button type="button" data-state="view-idle" aria-pressed="false">Idle</button>
+        <button type="button" data-state="view-media" aria-pressed="false">Media</button>
+        <button type="button" data-state="notification-popup" aria-pressed="false">Notification</button>
+    </nav>
+
+    <nav class="variant-picker" aria-label="Dashboard styles">
+        <button type="button" data-variant="signal" aria-pressed="true">Signal</button>
+        <button type="button" data-variant="aurora" aria-pressed="false">Aurora</button>
+        <button type="button" data-variant="pixel" aria-pressed="false">Pixel</button>
+    </nav>
 
     <script src="app.js"></script>
 </body>

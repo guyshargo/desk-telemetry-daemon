@@ -4,22 +4,25 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 
 from core.broker import event_queue
-from producers.web_media import router as web_media_router
-from producers.vlc_media import poll_vlc_state
+from core.loader import discover_and_load_plugins, start_all_plugins, stop_all_plugins
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-
-    # Boot up the standalone VLC monitor
-    asyncio.create_task(poll_vlc_state())
+    # Dynamically discover modules in 'producers' and mount their webhooks
+    discover_and_load_plugins(app)
+    
+    # start the start() method on all discovered plugins
+    await start_all_plugins()
+    
     yield  
-
+    
+    # shut down plugins on exit
+    await stop_all_plugins()
 
 app = FastAPI(lifespan=lifespan)
 
-# Register the Tampermonkey web events router
-app.include_router(web_media_router)
+discover_and_load_plugins(app)
 
 
 async def listen_for_disconnect(websocket: WebSocket):

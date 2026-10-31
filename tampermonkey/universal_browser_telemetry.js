@@ -10,6 +10,7 @@
 
 const TAB_ID = Math.random().toString(36).substring(2, 15);
 let lastUnreadCount = 0;
+const RATE_LIMIT_MS = 5000;
 
 // Triggers the exact millisecond you close a tab
 window.addEventListener("beforeunload", () => {
@@ -43,8 +44,49 @@ window.addEventListener("beforeunload", () => {
     }
 });
 
+// A helper function to safely push and manage the rate limit
+function pushWithRateLimit(payload) {
+    const now = Date.now();
+    const lastPushedTime = GM_getValue("last_pushed_time", 0);
+    const timeSinceLastPush = now - lastPushedTime;
+
+    // If we are past the 5-second lock, push immediately
+    if (timeSinceLastPush >= RATE_LIMIT_MS) {
+        GM_setValue("last_pushed_time", now);
+        GM_setValue("pending_payload", null); // Clear any pending events
+
+        GM_xmlhttpRequest({
+            method: "POST",
+            url: "http://localhost:8000/webhook",
+            headers: { "Content-Type": "application/json" },
+            data: JSON.stringify(payload)
+        });
+    }
+    else {
+        // in locked period so save this payload to be sent later.
+        GM_setValue("pending_payload", payload);
+    }
+}
+
 setInterval(() => {
     const host = window.location.hostname;
+
+    // If we are currently locked, check if it's time to release the lock
+    const now = Date.now();
+    const lastPushedTime = GM_getValue("last_pushed_time", 0);
+    const pendingPayload = GM_getValue("pending_payload", null);
+
+    // If the lock period ended and we have a missed event, push it
+    if (pendingPayload && (now - lastPushedTime >= RATE_LIMIT_MS)) {
+        GM_setValue("last_pushed_time", now);
+        GM_setValue("pending_payload", null);
+        GM_xmlhttpRequest({
+            method: "POST",
+            url: "http://localhost:8000/webhook",
+            headers: { "Content-Type": "application/json" },
+            data: JSON.stringify(pendingPayload)
+        });
+    }
 
     // 1. WhatsApp Web Notifications
     if (host.includes("whatsapp.com")) {
@@ -112,7 +154,6 @@ setInterval(() => {
 
     // 3. Global Tab Management
     let state = GM_getValue("media_tabs_state", {});
-    const now = Date.now();
 
     for (let id in state) {
         if (now - state[id].lastSeen > 5000) {

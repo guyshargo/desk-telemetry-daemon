@@ -36,6 +36,7 @@ class VLCPlugin(TelemetryPlugin):
             self._task.cancel()
 
     async def poll_vlc_state(self):
+        global vlc_currently_playing, last_vlc_title
         while True:
             vlc_data = await asyncio.to_thread(fetch_vlc_status)
             

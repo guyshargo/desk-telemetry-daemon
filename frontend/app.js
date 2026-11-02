@@ -3,6 +3,8 @@ const wsUrl = `${protocol}//${window.location.host}/ws`;
 const socket = new WebSocket(wsUrl);
 
 // State Tracking
+let mockMode = false;
+let mockState = null;
 let currentScreen = "view-idle";
 let notificationTimeout = null;
 let notificationPreviewInterval = null;
@@ -18,15 +20,28 @@ const mediaMockExamples = [
     { source: "Twitch", title: "Live: Just Chatting", artist: "shroud" },
     { source: "VLC", title: "Dreams", artist: "Fleetwood Mac" }
 ];
-const variants = ["signal", "aurora", "pixel"];
-const notificationReplayPeriodMs = 3000;
-const notificationExitDurationMs = 150;
-let mockState = new URLSearchParams(window.location.search).get("__state");
-if (!mockStates.includes(mockState)) mockState = null;
-let mockMode = mockState !== null;
-let mediaMockIndex = 0;
+const variants = ["bonfire", "neon", "notice-board", "spaceship-cockpit"];
+const assetMap = {
+    "bonfire": { 
+        video: "assets/bonfire.mp4", 
+        poster: "assets/Moonlit Knight by the Ruined Campfire.png" 
+    },
+    "neon": { 
+        video: "assets/neon.mp4", 
+        poster: "assets/neon.mp4" // Use video as poster if no JPG available, or pick a specific one
+    },
+    "notice-board": { 
+        video: "assets/notice_board.mp4", 
+        poster: "assets/Notice Board.jpg" 
+    },
+    "spaceship-cockpit": { 
+        video: "assets/spaceship_cockpit.mp4", 
+        poster: "assets/Spaceship Cockpit.jpg" 
+    }
+};
+
 let activeVariant = new URLSearchParams(window.location.search).get("__variant");
-if (!variants.includes(activeVariant)) activeVariant = "signal";
+if (!variants.includes(activeVariant)) activeVariant = "bonfire";
 document.body.dataset.variant = activeVariant;
 
 function renderVariantPicker() {
@@ -35,17 +50,40 @@ function renderVariantPicker() {
     });
 }
 
+function updateBackground(variant) {
+    const video = document.getElementById("bg-video");
+    const source = document.getElementById("bg-video-src");
+    const assets = assetMap[variant];
+
+    if (!assets) return;
+
+    // Fade out effect could be added here
+    video.style.opacity = 0;
+    
+    setTimeout(() => {
+        video.poster = assets.poster;
+        source.src = assets.video;
+        video.load();
+        video.play().catch(e => console.warn("Auto-play prevented:", e));
+        video.style.opacity = 1;
+    }, 200);
+}
+
 function setVariant(variant) {
     if (!variants.includes(variant)) return;
 
     activeVariant = variant;
     document.body.dataset.variant = variant;
     renderVariantPicker();
+    updateBackground(variant);
 
     const query = new URLSearchParams(window.location.search);
     query.set("__variant", variant);
     history.pushState(null, "", `${window.location.pathname}?${query}${window.location.hash}`);
 }
+
+// Initial background setup
+updateBackground(activeVariant);
 
 function getBrandClass(source) {
     const s = (source || "").toLowerCase();

@@ -8,6 +8,14 @@
 </head>
 <body data-variant="signal">
 
+    <!-- Background Layer -->
+    <div id="background-layer">
+        <video id="bg-video" autoplay muted loop playsinline poster="assets/Moonlit Knight by the Ruined Campfire.png">
+            <source id="bg-video-src" src="assets/bonfire.mp4" type="video/mp4">
+        </video>
+        <div id="bg-overlay"></div>
+    </div>
+
     <!-- Idle & Media Views -->
     <div id="base-layer">
         <div id="view-idle" class="screen active">
@@ -39,9 +47,10 @@
     </nav>
 
     <nav class="variant-picker" aria-label="Dashboard styles">
-        <button type="button" data-variant="signal" aria-pressed="true">Signal</button>
-        <button type="button" data-variant="aurora" aria-pressed="false">Aurora</button>
-        <button type="button" data-variant="pixel" aria-pressed="false">Pixel</button>
+        <button type="button" data-variant="bonfire" aria-pressed="true">Bonfire</button>
+        <button type="button" data-variant="neon" aria-pressed="false">Neon</button>
+        <button type="button" data-variant="notice-board" aria-pressed="false">Notice Board</button>
+        <button type="button" data-variant="spaceship-cockpit" aria-pressed="false">Cockpit</button>
     </nav>
 
     <script src="app.js"></script>

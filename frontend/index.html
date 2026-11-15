@@ -6,14 +6,20 @@
     <title>Telemetry Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body data-variant="signal">
+<body data-weather="clear-day" data-time-of-day="day">
 
     <!-- Background Layer -->
     <div id="background-layer">
-        <video id="bg-video" autoplay muted loop playsinline poster="assets/Moonlit Knight by the Ruined Campfire.png">
-            <source id="bg-video-src" src="assets/bonfire.mp4" type="video/mp4">
+        <video id="bg-video" autoplay muted loop playsinline poster="assets/bonfire.png">
+            <source id="bg-video-src" src="assets/bonfire_day.mp4" type="video/mp4">
         </video>
         <div id="bg-overlay"></div>
+    </div>
+
+    <!-- Weather Animation Layer -->
+    <div id="weather-layer" aria-hidden="true">
+        <canvas id="weather-canvas"></canvas>
+        <div id="weather-atmosphere"></div>
     </div>
 
     <!-- Idle & Media Views -->
@@ -40,19 +46,29 @@
         </div>
     </div>
 
+    <nav class="weather-switcher" aria-label="Weather options">
+        <button type="button" data-weather="clear-day" aria-pressed="true">Clear Day</button>
+        <button type="button" data-weather="clear-night" aria-pressed="false">Clear Night</button>
+        <button type="button" data-weather="cloudy" aria-pressed="false">Cloudy</button>
+        <button type="button" data-weather="foggy" aria-pressed="false">Foggy</button>
+        <button type="button" data-weather="rainy" aria-pressed="false">Rainy</button>
+        <button type="button" data-weather="snowy" aria-pressed="false">Snowy</button>
+        <button type="button" data-weather="stormy" aria-pressed="false">Stormy</button>
+    </nav>
+
     <nav class="state-switcher" aria-label="Mock states">
         <button type="button" data-state="view-idle" aria-pressed="false">Idle</button>
         <button type="button" data-state="view-media" aria-pressed="false">Media</button>
         <button type="button" data-state="notification-popup" aria-pressed="false">Notification</button>
     </nav>
 
-    <nav class="variant-picker" aria-label="Dashboard styles">
-        <button type="button" data-variant="bonfire" aria-pressed="true">Bonfire</button>
-        <button type="button" data-variant="neon" aria-pressed="false">Neon</button>
-        <button type="button" data-variant="notice-board" aria-pressed="false">Notice Board</button>
-        <button type="button" data-variant="spaceship-cockpit" aria-pressed="false">Cockpit</button>
-    </nav>
-
+    <script src="animations/weather/cloudy.js"></script>
+    <script src="animations/weather/rain.js"></script>
+    <script src="animations/weather/snow.js"></script>
+    <script src="animations/weather/storm.js"></script>
+    <script src="animations/weather/fog.js"></script>
+    <script src="animations/weather-engine.js"></script>
+    <script src="weather.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

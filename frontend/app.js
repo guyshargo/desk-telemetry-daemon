@@ -5,6 +5,8 @@ const socket = new WebSocket(wsUrl);
 // State Tracking
 let mockMode = false;
 let mockState = null;
+const notificationReplayPeriodMs = 4000;
+const notificationExitDurationMs = 200;
 let currentScreen = "view-idle";
 let notificationTimeout = null;
 let notificationPreviewInterval = null;
@@ -13,6 +15,7 @@ let transitionTimeout = null;
 let mediaMockInterval = null;
 let mediaUpdateTimeout = null;
 let mediaUpdateFrame = null;
+let activeBgVideoSrc = "";
 const mockStates = ["view-idle", "view-media", "notification-popup"];
 const mediaMockExamples = [
     { source: "Spotify", title: "Midnight City", artist: "M83" },
@@ -20,70 +23,29 @@ const mediaMockExamples = [
     { source: "Twitch", title: "Live: Just Chatting", artist: "shroud" },
     { source: "VLC", title: "Dreams", artist: "Fleetwood Mac" }
 ];
-const variants = ["bonfire", "neon", "notice-board", "spaceship-cockpit"];
-const assetMap = {
-    "bonfire": { 
-        video: "assets/bonfire.mp4", 
-        poster: "assets/Moonlit Knight by the Ruined Campfire.png" 
-    },
-    "neon": { 
-        video: "assets/neon.mp4", 
-        poster: "assets/neon.mp4" // Use video as poster if no JPG available, or pick a specific one
-    },
-    "notice-board": { 
-        video: "assets/notice_board.mp4", 
-        poster: "assets/Notice Board.jpg" 
-    },
-    "spaceship-cockpit": { 
-        video: "assets/spaceship_cockpit.mp4", 
-        poster: "assets/Spaceship Cockpit.jpg" 
-    }
-};
 
-let activeVariant = new URLSearchParams(window.location.search).get("__variant");
-if (!variants.includes(activeVariant)) activeVariant = "bonfire";
-document.body.dataset.variant = activeVariant;
-
-function renderVariantPicker() {
-    document.querySelectorAll(".variant-picker [data-variant]").forEach((button) => {
-        button.setAttribute("aria-pressed", String(button.dataset.variant === activeVariant));
-    });
-}
-
-function updateBackground(variant) {
+function updateBackground() {
     const video = document.getElementById("bg-video");
     const source = document.getElementById("bg-video-src");
-    const assets = assetMap[variant];
+    if (!video || !source) return;
 
-    if (!assets) return;
+    const isNight = document.body.dataset.timeOfDay === "night";
+    const nextVideo = isNight ? "assets/bonfire_night.mp4" : "assets/bonfire_day.mp4";
 
-    // Fade out effect could be added here
+    if (nextVideo === activeBgVideoSrc) return;
+    activeBgVideoSrc = nextVideo;
+
     video.style.opacity = 0;
-    
     setTimeout(() => {
-        video.poster = assets.poster;
-        source.src = assets.video;
+        source.src = nextVideo;
         video.load();
         video.play().catch(e => console.warn("Auto-play prevented:", e));
         video.style.opacity = 1;
     }, 200);
 }
 
-function setVariant(variant) {
-    if (!variants.includes(variant)) return;
-
-    activeVariant = variant;
-    document.body.dataset.variant = variant;
-    renderVariantPicker();
-    updateBackground(variant);
-
-    const query = new URLSearchParams(window.location.search);
-    query.set("__variant", variant);
-    history.pushState(null, "", `${window.location.pathname}?${query}${window.location.hash}`);
-}
-
-// Initial background setup
-updateBackground(activeVariant);
+document.addEventListener("weatherchange", updateBackground);
+updateBackground();
 
 function getBrandClass(source) {
     const s = (source || "").toLowerCase();
@@ -305,8 +267,24 @@ document.querySelectorAll(".state-switcher [data-state]").forEach((button) => {
     button.addEventListener("click", () => switchToMockState(button.dataset.state));
 });
 
-document.querySelectorAll(".variant-picker [data-variant]").forEach((button) => {
-    button.addEventListener("click", () => setVariant(button.dataset.variant));
+function renderWeatherSwitcher(activeWeather) {
+    document.querySelectorAll(".weather-switcher [data-weather]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.weather === activeWeather));
+    });
+}
+
+document.querySelectorAll(".weather-switcher [data-weather]").forEach((button) => {
+    button.addEventListener("click", () => {
+        const weather = button.dataset.weather;
+        window.WeatherEngine?.setWeatherVariant(weather, null, true);
+        renderWeatherSwitcher(weather);
+    });
+});
+
+document.addEventListener("weatherchange", (event) => {
+    if (event.detail && event.detail.weather) {
+        renderWeatherSwitcher(event.detail.weather);
+    }
 });
 
 document.addEventListener("keydown", (event) => {
@@ -322,34 +300,25 @@ document.addEventListener("keydown", (event) => {
 
     const focusedStatePicker = event.target.closest(".state-switcher");
     if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-        if (!focusedStatePicker) {
-            const activeIndex = variants.indexOf(activeVariant);
+        if (focusedStatePicker) {
+            const activeIndex = mockStates.indexOf(mockState);
+            const startIndex = activeIndex === -1 ? 0 : activeIndex;
             const direction = event.key === "ArrowRight" ? 1 : -1;
-            const nextIndex = (activeIndex + direction + variants.length) % variants.length;
-            setVariant(variants[nextIndex]);
-            document.querySelector(`[data-variant="${variants[nextIndex]}"]`).scrollIntoView({
+            const nextIndex = (startIndex + direction + mockStates.length) % mockStates.length;
+            switchToMockState(mockStates[nextIndex]);
+            document.querySelector(`[data-state="${mockStates[nextIndex]}"]`).scrollIntoView({
                 block: "nearest",
                 inline: "nearest"
             });
             event.preventDefault();
-            return;
         }
-
-        const activeIndex = mockStates.indexOf(mockState);
-        const startIndex = activeIndex === -1 ? 0 : activeIndex;
-        const direction = event.key === "ArrowRight" ? 1 : -1;
-        const nextIndex = (startIndex + direction + mockStates.length) % mockStates.length;
-        switchToMockState(mockStates[nextIndex]);
-        document.querySelector(`[data-state="${mockStates[nextIndex]}"]`).scrollIntoView({
-            block: "nearest",
-            inline: "nearest"
-        });
-        event.preventDefault();
+        return;
     }
     else if (event.key.toLowerCase() === "h") {
         const shouldHide = !document.querySelector(".state-switcher").hidden;
         document.querySelector(".state-switcher").hidden = shouldHide;
-        document.querySelector(".variant-picker").hidden = shouldHide;
+        const weatherSwitcher = document.querySelector(".weather-switcher");
+        if (weatherSwitcher) weatherSwitcher.hidden = shouldHide;
         event.preventDefault();
         return;
     }
@@ -358,18 +327,12 @@ document.addEventListener("keydown", (event) => {
     if (focusedStatePicker && Number.isInteger(stateIndex) && stateIndex >= 0 && stateIndex < mockStates.length) {
         switchToMockState(mockStates[stateIndex]);
         event.preventDefault();
-    } else if (!focusedStatePicker && Number.isInteger(stateIndex) && stateIndex >= 0 && stateIndex < variants.length) {
-        setVariant(variants[stateIndex]);
-        event.preventDefault();
     }
 });
 
+renderWeatherSwitcher(document.body.dataset.weather || "clear-day");
+
 window.addEventListener("popstate", () => {
-    const query = new URLSearchParams(window.location.search);
-    const variant = query.get("__variant");
-    activeVariant = variants.includes(variant) ? variant : "signal";
-    document.body.dataset.variant = activeVariant;
-    renderVariantPicker();
     updateMockModeFromUrl();
 });
 
@@ -409,5 +372,4 @@ socket.onclose = () => {
     });
 };
 
-renderVariantPicker();
 if (mockMode) renderMockState(mockState);

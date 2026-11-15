@@ -1,7 +1,6 @@
 const VIRTUAL_WIDTH = 480;
 const VIRTUAL_HEIGHT = 270;
 
-// Scene landmarks in virtual coordinates (480x270)
 const CAMPFIRE = { x: 192, y: 196, glowRadius: 92 };
 const SIGNBOARD_TOP = { xMin: 294, xMax: 442, y: 117 };
 const GROUND_Y_MIN = 214;
@@ -41,7 +40,6 @@ function spawnSplash(x, y, warm) {
 function getDropColor(x, y, foreground, isNight) {
     const dist = Math.hypot(x - CAMPFIRE.x, y - CAMPFIRE.y);
 
-    // Drops near the bonfire catch orange light
     if (dist < CAMPFIRE.glowRadius) {
         return foreground ? "rgba(255, 198, 132, 0.78)" : "rgba(255, 176, 102, 0.45)";
     }
@@ -134,7 +132,7 @@ function renderRainFrame() {
     rainAnimationId = requestAnimationFrame(renderRainFrame);
 }
 
-function startRain() {
+export function start() {
     if (rainAnimationId !== null) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
@@ -154,7 +152,7 @@ function startRain() {
     rainAnimationId = requestAnimationFrame(renderRainFrame);
 }
 
-function stopRain() {
+export function stop() {
     if (rainAnimationId !== null) {
         cancelAnimationFrame(rainAnimationId);
         rainAnimationId = null;
@@ -167,8 +165,3 @@ function stopRain() {
         rainCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
     }
 }
-
-window.RainEffect = {
-    start: startRain,
-    stop: stopRain
-};

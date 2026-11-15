@@ -1,3 +1,4 @@
+import { updateWeather } from './weather-engine.js';
 
 const WEATHER_API_URL = "https://api.open-meteo.com/v1/forecast";
 const WEATHER_REFRESH_INTERVAL = 30 * 60 * 1000; // 30 minutes
@@ -36,7 +37,7 @@ async function refreshWeather() {
             userCoordinates.longitude
         );
 
-        window.WeatherEngine.updateWeather(weatherData);
+        updateWeather(weatherData);
 
         console.log("Weather updated:", weatherData);
     } catch (error) {
@@ -44,7 +45,7 @@ async function refreshWeather() {
     }
 }
 
-function initializeWeather() {
+export function initializeWeather() {
     if (!navigator.geolocation) {
         console.warn("Geolocation is not supported by this browser.");
         return;
@@ -61,7 +62,6 @@ function initializeWeather() {
 
             await refreshWeather();
 
-            // Refresh weather periodically.
             setInterval(refreshWeather, WEATHER_REFRESH_INTERVAL);
         },
         (error) => {
@@ -74,6 +74,3 @@ function initializeWeather() {
         }
     );
 }
-
-// Initialize after the page has loaded.
-document.addEventListener("DOMContentLoaded", initializeWeather);

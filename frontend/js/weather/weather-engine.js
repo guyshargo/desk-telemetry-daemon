@@ -1,3 +1,9 @@
+import { start as startCloud, stop as stopCloud } from './effects/cloudy.js';
+import { start as startRain, stop as stopRain } from './effects/rain.js';
+import { start as startSnow, stop as stopSnow } from './effects/snow.js';
+import { start as startStorm, stop as stopStorm } from './effects/storm.js';
+import { start as startFog, stop as stopFog } from './effects/fog.js';
+
 const weatherVariants = [
     "clear-day",
     "clear-night",
@@ -8,7 +14,7 @@ const weatherVariants = [
     "stormy"
 ];
 
-function getWeatherVariant(weatherCode, isDay, cloudCover = 0) {
+export function getWeatherVariant(weatherCode, isDay, cloudCover = 0) {
     if (weatherCode >= 95) return "stormy"; // 95, 96, 99: Thunderstorms
     if (weatherCode >= 85) return "snowy";  // 85–86: Snow showers
     if (weatherCode >= 80) return "rainy";  // 80–82: Rain showers
@@ -22,30 +28,30 @@ function getWeatherVariant(weatherCode, isDay, cloudCover = 0) {
 }
 
 function stopAllWeatherEffects() {
-    window.RainEffect?.stop();
-    window.SnowEffect?.stop();
-    window.StormEffect?.stop();
-    window.FogEffect?.stop();
-    window.CloudEffect?.stop();
+    stopRain();
+    stopSnow();
+    stopStorm();
+    stopFog();
+    stopCloud();
 }
 
 function syncWeatherEffect(variant) {
     stopAllWeatherEffects();
 
     if (variant === "cloudy") {
-        window.CloudEffect?.start?.();
+        startCloud();
     } else if (variant === "rainy") {
-        window.RainEffect?.start?.();
+        startRain();
     } else if (variant === "snowy") {
-        window.SnowEffect?.start?.();
+        startSnow();
     } else if (variant === "stormy") {
-        window.StormEffect?.start?.();
+        startStorm();
     } else if (variant === "foggy") {
-        window.FogEffect?.start?.();
+        startFog();
     }
 }
 
-function setTimeOfDay(isDay) {
+export function setTimeOfDay(isDay) {
     const timeOfDay = isDay ? "day" : "night";
     if (document.body.dataset.timeOfDay === timeOfDay) return;
 
@@ -60,7 +66,7 @@ function setTimeOfDay(isDay) {
 
 let manualOverride = false;
 
-function setWeatherVariant(variant, isDay = null, isManual = false) {
+export function setWeatherVariant(variant, isDay = null, isManual = false) {
     if (!weatherVariants.includes(variant)) {
         console.warn(`Unknown weather variant: ${variant}`);
         return;
@@ -87,7 +93,7 @@ function setWeatherVariant(variant, isDay = null, isManual = false) {
     }));
 }
 
-function updateWeather(weatherData) {
+export function updateWeather(weatherData) {
     if (manualOverride) return;
 
     const isDay = weatherData.is_day === 1;
@@ -99,11 +105,3 @@ function updateWeather(weatherData) {
 
     setWeatherVariant(variant, isDay, false);
 }
-
-// Expose the engine for weather.js and console testing.
-window.WeatherEngine = {
-    updateWeather,
-    setWeatherVariant,
-    setTimeOfDay,
-    getWeatherVariant
-};

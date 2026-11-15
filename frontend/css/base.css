@@ -1,0 +1,128 @@
+:root {
+    --variant-top: 48%;
+    --variant-left: 76%;
+    --variant-rotate: -1.25deg;
+    --variant-max-width: 600px;
+    --variant-scale: 1;
+    --variant-opacity: 1;
+
+    /* Day default: dark painted ink on sunlit parchment */
+    --board-title-color: #26140c;
+    --board-title-shadow: 0 1px 0 rgba(255, 236, 208, 0.55);
+    --board-sub-color: #462819;
+    --board-sub-shadow: 0 1px 0 rgba(255, 236, 208, 0.45);
+    --board-badge-bg: rgba(28, 16, 10, 0.76);
+}
+
+body[data-time-of-day="night"] {
+    /* Night: warm firelit ink with dark grounding shadow */
+    --board-title-color: #ffe2c4;
+    --board-title-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 14px rgba(255, 140, 0, 0.35);
+    --board-sub-color: #dfb48c;
+    --board-sub-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+    --board-badge-bg: rgba(12, 8, 6, 0.72);
+}
+
+body {
+    background-color: #000;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* --- TYPOGRAPHY & BRANDING --- */
+.source-label {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-size: 0.75rem;
+    font-style: normal;
+    font-weight: 700;
+    background: var(--board-badge-bg);
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+    transition-property: background-color, color;
+    transition-duration: 400ms;
+    transition-timing-function: ease;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.primary-text {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    color: var(--board-title-color);
+    text-shadow: var(--board-title-shadow);
+    font-size: clamp(1.5rem, 6vw, 2.25rem);
+    line-height: 1.1;
+    margin: 0.4rem 0;
+    transition-property: color, text-shadow;
+    transition-duration: 400ms;
+    transition-timing-function: ease;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.secondary-text {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-weight: 600;
+    color: var(--board-sub-color);
+    text-shadow: var(--board-sub-shadow);
+    letter-spacing: 0.04em;
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    margin: 0;
+    transition-property: color, text-shadow;
+    transition-duration: 400ms;
+    transition-timing-function: ease;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.brand-spotify { color: #2ee66b; }
+.brand-youtube { color: #ff5252; }
+.brand-twitch { color: #b388ff; }
+.brand-whatsapp { color: #39e578; }
+.brand-vlc { color: #ffa033; }
+.brand-default { color: #ffad5c; }
+
+.idle-pulse {
+    color: var(--board-title-color);
+    text-shadow: var(--board-title-shadow);
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-size: 1.25rem;
+    font-weight: 700;
+    animation: pulse 2s infinite;
+    transition-property: color, text-shadow;
+    transition-duration: 400ms;
+    transition-timing-function: ease;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.45; }
+    50% { opacity: 1; }
+    100% { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .idle-pulse {
+        animation: none;
+        opacity: 0.85;
+    }
+}

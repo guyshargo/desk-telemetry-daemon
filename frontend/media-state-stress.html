@@ -2,31 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media State Stress Scenarios</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Media State Stress Scenarios - Telemetry Dashboard</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/environment.css">
+    <link rel="stylesheet" href="css/views.css">
+    <link rel="stylesheet" href="css/dev-controls.css">
     <style>
         body {
             display: block;
             height: auto;
             min-height: 100vh;
+            min-height: 100dvh;
             overflow: auto;
+            background: #111;
+            padding: 2rem 1rem;
         }
 
         .stress-report {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1rem;
+            align-items: center;
+            gap: 2rem;
+            max-width: 1024px;
+            margin: 0 auto;
         }
 
-        .scenario {
-            max-width: calc(100vw - 2rem);
+        .stress-header {
+            text-align: center;
+            color: #ffe2c4;
+            font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+            margin-bottom: 1rem;
+        }
+
+        .stress-header h1 {
+            font-size: 2rem;
+            margin: 0 0 0.5rem;
+        }
+
+        .stress-header p {
+            font-size: 0.95rem;
+            color: #dfb48c;
+            margin: 0;
+        }
+
+        .scenario-card {
+            width: 100%;
+            background: rgba(20, 16, 14, 0.85);
+            border: 1px solid rgba(255, 230, 200, 0.15);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
         .scenario-label {
-            margin: 0 0 0.5rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffad5c;
+            margin: 0 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .fixture-shell {
@@ -34,6 +71,11 @@
             width: 320px;
             max-width: 100%;
             min-width: 0;
+            margin: 0 auto;
+            background: #222;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
         }
 
         .fixture-shell--wide {
@@ -48,7 +90,11 @@
             position: relative;
             flex: 1 1 auto;
             min-width: 0;
-            height: 220px;
+            height: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #2b1810 0%, #1a0f0a 100%);
         }
 
         .fixture-shell--squeezed .media-frame {
@@ -57,137 +103,164 @@
 
         .fixture-sibling {
             display: none;
-            flex: 0 0 88px;
+            flex: 0 0 96px;
             align-self: stretch;
-            margin-left: 0.5rem;
+            background: rgba(255, 255, 255, 0.06);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .fixture-shell--squeezed .fixture-sibling {
-            display: block;
+            display: flex;
         }
 
+        /* Override screen absolute positioning inside static stress test frames */
         .media-frame .screen {
-            inset: 0;
+            position: relative;
+            inset: auto;
+            transform: none;
             width: 100%;
             max-width: 100%;
+            height: 100%;
+            opacity: 1;
+            padding: 1rem 2rem;
+            background: rgba(255, 248, 238, 0.94);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls-toolbar {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
         }
     </style>
 </head>
-<body data-variant="signal">
+<body data-weather="clear-day" data-time-of-day="day">
     <main class="stress-report" aria-label="Media state stress scenarios">
-        <section class="scenario">
-            <h2 class="scenario-label">150-character YouTube title · 320px container</h2>
+        <header class="stress-header">
+            <h1>Media State Stress Report</h1>
+            <p>Testing edge cases (long unspaced strings, 150+ char titles, missing artist/source, containers, and weather lighting) against refactored styles.</p>
+        </header>
+
+        <div class="controls-toolbar">
+            <button type="button" id="toggle-time" aria-pressed="false">Toggle Night Mode</button>
+            <button type="button" data-weather-btn="clear-day">Clear Day</button>
+            <button type="button" data-weather-btn="stormy">Stormy</button>
+            <button type="button" data-weather-btn="foggy">Foggy</button>
+        </div>
+
+        <!-- Scenario 1: Typical Content -->
+        <section class="scenario-card">
+            <h2 class="scenario-label"><span>1. Typical Content · 320px container</span> <span class="badge">better-layout</span></h2>
             <div class="fixture-shell">
-                <div class="media-frame">
-                    <div class="screen active">
-                        <div class="media-content">
-                            <div class="source-label"></div>
-                            <h1 class="primary-text"></h1>
-                            <h2 class="secondary-text"></h2>
-                        </div>
-                    </div>
-                </div>
+                <div class="media-frame" data-source="Spotify" data-title="Midnight City" data-artist="M83"></div>
             </div>
         </section>
 
-        <section class="scenario">
-            <h2 class="scenario-label">150-character YouTube title · squeezed by flex sibling</h2>
-            <div class="fixture-shell fixture-shell--squeezed">
-                <div class="media-frame">
-                    <div class="screen active">
-                        <div class="media-content">
-                            <div class="source-label"></div>
-                            <h1 class="primary-text"></h1>
-                            <h2 class="secondary-text"></h2>
-                        </div>
-                    </div>
-                </div>
-                <aside class="fixture-sibling" aria-hidden="true"></aside>
-            </div>
-        </section>
-
-        <section class="scenario">
-            <h2 class="scenario-label">150-character YouTube title · 960px wide container</h2>
-            <div class="fixture-shell fixture-shell--wide">
-                <div class="media-frame">
-                    <div class="screen active">
-                        <div class="media-content">
-                            <div class="source-label"></div>
-                            <h1 class="primary-text"></h1>
-                            <h2 class="secondary-text"></h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="scenario">
-            <h2 class="scenario-label">Missing source name · 320px container</h2>
+        <!-- Scenario 2: 150+ Char Title -->
+        <section class="scenario-card">
+            <h2 class="scenario-label"><span>2. 150+ Character YouTube Title · 320px container</span> <span class="badge">better-typography</span></h2>
             <div class="fixture-shell">
-                <div class="media-frame">
-                    <div class="screen active">
-                        <div class="media-content">
-                            <div class="source-label"></div>
-                            <h1 class="primary-text"></h1>
-                            <h2 class="secondary-text"></h2>
-                        </div>
-                    </div>
-                </div>
+                <div class="media-frame" data-source="YouTube" data-title="A Walk Through the Moonlit City: Ambient night beats, synthwave melodies, neon lights, and quiet streets after midnight for ultimate focus and relaxation (Extended Mix)." data-artist="Tycho"></div>
             </div>
         </section>
 
-        <section class="scenario">
-            <h2 class="scenario-label">Missing source name · squeezed by flex sibling</h2>
+        <!-- Scenario 3: Squeezed by Flex Sibling with 150+ Char Title -->
+        <section class="scenario-card">
+            <h2 class="scenario-label"><span>3. 150+ Character Title · Squeezed by flex sibling</span> <span class="badge">better-layout</span></h2>
             <div class="fixture-shell fixture-shell--squeezed">
-                <div class="media-frame">
-                    <div class="screen active">
-                        <div class="media-content">
-                            <div class="source-label"></div>
-                            <h1 class="primary-text"></h1>
-                            <h2 class="secondary-text"></h2>
-                        </div>
-                    </div>
-                </div>
-                <aside class="fixture-sibling" aria-hidden="true"></aside>
+                <div class="media-frame" data-source="YouTube" data-title="A Walk Through the Moonlit City: Ambient night beats, synthwave melodies, neon lights, and quiet streets after midnight for ultimate focus and relaxation (Extended Mix)." data-artist="Tycho"></div>
+                <aside class="fixture-sibling" aria-hidden="true">Sidebar</aside>
             </div>
         </section>
 
-        <section class="scenario">
-            <h2 class="scenario-label">Missing source name · 960px wide container</h2>
+        <!-- Scenario 4: Wide Container -->
+        <section class="scenario-card">
+            <h2 class="scenario-label"><span>4. Typical Content · 960px Wide Container</span> <span class="badge">better-layout</span></h2>
             <div class="fixture-shell fixture-shell--wide">
-                <div class="media-frame">
-                    <div class="screen active">
-                        <div class="media-content">
-                            <div class="source-label"></div>
-                            <h1 class="primary-text"></h1>
-                            <h2 class="secondary-text"></h2>
-                        </div>
-                    </div>
-                </div>
+                <div class="media-frame" data-source="Spotify" data-title="Digital Love" data-artist="Daft Punk"></div>
+            </div>
+        </section>
+
+        <!-- Scenario 5: Unbreakable Long String -->
+        <section class="scenario-card">
+            <h2 class="scenario-label"><span>5. One Unbreakable 60+ Char String · 320px container</span> <span class="badge">better-typography</span></h2>
+            <div class="fixture-shell">
+                <div class="media-frame" data-source="Vlc" data-title="Donaudampfschiffahrtsgesellschaftselectricalengineeringprototype" data-artist="Kraftwerk"></div>
+            </div>
+        </section>
+
+        <!-- Scenario 6: Missing Source & Artist -->
+        <section class="scenario-card">
+            <h2 class="scenario-label"><span>6. Missing Source Name & Missing Artist · 320px container</span> <span class="badge">better-writing</span></h2>
+            <div class="fixture-shell">
+                <div class="media-frame" data-source="" data-title="Unknown Track" data-artist=""></div>
+            </div>
+        </section>
+
+        <!-- Scenario 7: Emoji and Diacritics -->
+        <section class="scenario-card">
+            <h2 class="scenario-label"><span>7. Emoji & Diacritics (Élégance 🎧) · 320px container</span> <span class="badge">better-typography</span></h2>
+            <div class="fixture-shell">
+                <div class="media-frame" data-source="Twitch" data-title="L'été en Ville 🎧 Live Session" data-artist="Björk & Sigur Rós ✨"></div>
+            </div>
+        </section>
+
+        <!-- Scenario 8: Empty String Edge Case -->
+        <section class="scenario-card">
+            <h2 class="scenario-label"><span>8. Empty String Title & Source · 320px container</span> <span class="badge">better-writing</span></h2>
+            <div class="fixture-shell">
+                <div class="media-frame" data-source="" data-title="" data-artist=""></div>
             </div>
         </section>
     </main>
 
     <script>
-        const longTitle = "A Walk Through the Moonlit City: "
-            .padEnd(150, "Music, lights, and quiet streets after midnight. ")
-            .slice(0, 150);
-        const fixtures = [
-            { source: "YouTube", title: longTitle, artist: "Tycho" },
-            { title: "Midnight City", artist: "M83" }
-        ];
+        function renderFixtures() {
+            document.querySelectorAll(".media-frame").forEach((frame) => {
+                const source = frame.dataset.source;
+                const title = frame.dataset.title;
+                const artist = frame.dataset.artist;
 
-        document.querySelectorAll(".scenario").forEach((scenario, index) => {
-            const fixture = fixtures[Math.floor(index / 3)];
-            const frame = scenario.querySelector(".media-frame");
-            const source = fixture.source;
-            const sourceLabel = frame.querySelector(".source-label");
-            sourceLabel.innerText = source;
-            const sourceKey = (source || "").toLowerCase();
-            const brand = sourceKey.includes("youtube") ? "brand-youtube" : "brand-default";
-            sourceLabel.classList.add(brand);
-            frame.querySelector(".primary-text").innerText = fixture.title;
-            frame.querySelector(".secondary-text").innerText = fixture.artist;
+                const sourceKey = (source || "").toLowerCase();
+                let brandClass = "brand-default";
+                if (sourceKey.includes("spotify")) brandClass = "brand-spotify";
+                else if (sourceKey.includes("youtube")) brandClass = "brand-youtube";
+                else if (sourceKey.includes("twitch")) brandClass = "brand-twitch";
+                else if (sourceKey.includes("whatsapp")) brandClass = "brand-whatsapp";
+                else if (sourceKey.includes("vlc")) brandClass = "brand-vlc";
+
+                frame.innerHTML = `
+                    <div class="screen active">
+                        <div class="media-content">
+                            <div class="source-label ${brandClass}" style="${!source ? 'display: none;' : ''}">${source}</div>
+                            <h1 class="primary-text">${title || 'Awaiting Title'}</h1>
+                            <h2 class="secondary-text">${artist || 'Unknown Artist'}</h2>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        renderFixtures();
+
+        document.getElementById("toggle-time").addEventListener("click", () => {
+            const isNight = document.body.dataset.timeOfDay === "night";
+            document.body.dataset.timeOfDay = isNight ? "day" : "night";
+            document.getElementById("toggle-time").setAttribute("aria-pressed", String(!isNight));
+        });
+
+        document.querySelectorAll("[data-weather-btn]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const weather = btn.dataset.weatherBtn;
+                document.body.dataset.weather = weather;
+            });
         });
     </script>
 </body>

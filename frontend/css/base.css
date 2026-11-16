@@ -1,8 +1,11 @@
 :root {
-    --variant-top: 48%;
-    --variant-left: 76%;
+    --variant-top: 49.5%;
+    --variant-left: 76.5%;
+    --variant-perspective: 380px;
+    --variant-rotate-x: 1.5deg;
+    --variant-rotate-y: -14deg;
     --variant-rotate: -1.25deg;
-    --variant-max-width: 600px;
+    --variant-max-width: 27%;
     --variant-scale: 1;
     --variant-opacity: 1;
 
@@ -37,14 +40,15 @@ body {
 /* --- TYPOGRAPHY & BRANDING --- */
 .source-label {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-    font-size: 0.75rem;
+    font-size: clamp(0.45rem, 3cqi, 0.7rem);
     font-style: normal;
     font-weight: 700;
     background: var(--board-badge-bg);
-    padding: 3px 10px;
+    padding: 2px 4px;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.14);
-    margin-bottom: 6px;
+    margin-top: 2px;
+    margin-bottom: 1px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
@@ -64,9 +68,9 @@ body {
     letter-spacing: 0.02em;
     color: var(--board-title-color);
     text-shadow: var(--board-title-shadow);
-    font-size: clamp(1.5rem, 6vw, 2.25rem);
+    font-size: clamp(0.7rem, 6cqi, 1.35rem);
     line-height: 1.1;
-    margin: 0.4rem 0;
+    margin: 0.1rem 0;
     transition-property: color, text-shadow;
     transition-duration: 400ms;
     transition-timing-function: ease;
@@ -74,6 +78,10 @@ body {
     word-break: break-word;
     min-width: 0;
     max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .secondary-text {
@@ -82,7 +90,7 @@ body {
     color: var(--board-sub-color);
     text-shadow: var(--board-sub-shadow);
     letter-spacing: 0.04em;
-    font-size: clamp(1rem, 4vw, 1.25rem);
+    font-size: clamp(0.55rem, 4.5cqi, 0.9rem);
     margin: 0;
     transition-property: color, text-shadow;
     transition-duration: 400ms;
@@ -91,6 +99,10 @@ body {
     word-break: break-word;
     min-width: 0;
     max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .brand-spotify { color: #2ee66b; }
@@ -104,9 +116,9 @@ body {
     color: var(--board-title-color);
     text-shadow: var(--board-title-shadow);
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-    letter-spacing: 0.3em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    font-size: 1.25rem;
+    font-size: clamp(0.75rem, 6cqi, 1.2rem);
     font-weight: 700;
     animation: pulse 2s infinite;
     transition-property: color, text-shadow;

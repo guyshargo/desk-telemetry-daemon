@@ -8,9 +8,12 @@ body,
 
 /* --- BASE LAYER (Media & Idle) --- */
 #base-layer {
-    position: relative;
-    width: 100%;
-    height: 100%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(100vw, calc(100dvh * (16 / 9)));
+    height: min(100dvh, calc(100vw * (9 / 16)));
     z-index: 1;
     transition-property: filter, opacity;
     transition-duration: 800ms;
@@ -35,21 +38,28 @@ body[data-weather="stormy"] #base-layer {
     position: absolute;
     top: var(--variant-top);
     left: var(--variant-left);
-    transform: translate(-50%, -50%) rotate(var(--variant-rotate)) scale(var(--variant-scale));
+    transform:
+        translate(-50%, -50%)
+        perspective(var(--variant-perspective))
+        rotateY(var(--variant-rotate-y))
+        rotateX(var(--variant-rotate-x))
+        rotateZ(var(--variant-rotate))
+        scale(var(--variant-scale));
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
     box-sizing: border-box;
     width: var(--variant-max-width);
-    min-height: 220px;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    max-width: 90vw;
-    max-height: calc(100dvh - 4rem);
+    max-width: 27%;
+    max-height: 24%;
     min-width: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding: 1.5rem 5.5rem;
-    border-radius: 16px;
+    overflow: hidden;
+    padding: 1.2% 0.75%;
+    border-radius: 8px;
     text-align: center;
     opacity: 0;
     transition-property: opacity, transform, top, left;
@@ -58,6 +68,7 @@ body[data-weather="stormy"] #base-layer {
     pointer-events: none;
     border: none;
     color: var(--board-title-color);
+    container-type: inline-size;
 }
 
 .screen.active {
@@ -68,10 +79,11 @@ body[data-weather="stormy"] #base-layer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.2rem;
     width: 100%;
     max-width: 100%;
     min-width: 0;
+    box-sizing: border-box;
     opacity: 1;
     transition-property: opacity, transform;
     transition-duration: 180ms;

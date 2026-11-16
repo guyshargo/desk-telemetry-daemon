@@ -1,21 +1,21 @@
 /* --- BACKGROUND LAYER --- */
 #background-layer {
     position: fixed;
-    inset: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(100vw, calc(100dvh * (16 / 9)));
+    height: min(100dvh, calc(100vw * (9 / 16)));
     z-index: -1;
     overflow: hidden;
 }
 
 #bg-video {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    transform: translate(-50%, -50%);
-    object-fit: cover;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
     transition: opacity 0.2s ease, filter 0.8s ease;
 }
 
@@ -29,7 +29,11 @@
 /* --- WEATHER ANIMATION LAYER --- */
 #weather-layer {
     position: fixed;
-    inset: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(100vw, calc(100dvh * (16 / 9)));
+    height: min(100dvh, calc(100vw * (9 / 16)));
     z-index: 0;
     overflow: hidden;
     pointer-events: none;

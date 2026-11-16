@@ -18,7 +18,10 @@ def fetch_vlc_status():
     
     try:
         with urllib.request.urlopen(req, timeout=1) as response:
-            return json.loads(response.read())
+            raw_data = response.read()
+            decoded_data = raw_data.decode("utf-8", errors="replace")
+
+            return json.loads(decoded_data)
     except Exception:
         return None
 

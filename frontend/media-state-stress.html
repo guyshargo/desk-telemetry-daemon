@@ -3,265 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Media State Stress Scenarios - Telemetry Dashboard</title>
+    <title>Bonfire Notice-Board & Media Stress Test</title>
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/environment.css">
     <link rel="stylesheet" href="css/views.css">
     <link rel="stylesheet" href="css/dev-controls.css">
     <style>
         body {
-            display: block;
-            height: auto;
-            min-height: 100vh;
-            min-height: 100dvh;
-            overflow: auto;
-            background: #111;
+            overflow-y: auto !important;
+            height: auto !important;
             padding: 2rem 1rem;
+            background: #111;
         }
-
-        .stress-report {
+        .stress-container {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 2rem;
-            max-width: 1024px;
-            margin: 0 auto;
+            gap: 2.5rem;
         }
-
-        .stress-header {
-            text-align: center;
-            color: #ffe2c4;
-            font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-            margin-bottom: 1rem;
-        }
-
-        .stress-header h1 {
-            font-size: 2rem;
-            margin: 0 0 0.5rem;
-        }
-
-        .stress-header p {
-            font-size: 0.95rem;
-            color: #dfb48c;
-            margin: 0;
-        }
-
-        .scenario-card {
-            width: 100%;
-            background: rgba(20, 16, 14, 0.85);
-            border: 1px solid rgba(255, 230, 200, 0.15);
-            border-radius: 16px;
+        .stress-section {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        .stress-section h2 {
+            font-family: system-ui, sans-serif;
+            font-size: 1.1rem;
+            color: #ffb74d;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+        .section-note {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-top: 0;
+            margin-bottom: 1.25rem;
         }
 
-        .scenario-label {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #ffad5c;
-            margin: 0 0 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        /* --- REAL SCENE SIMULATION (16:9 stage inside Redmi Note 9 19.5:9 frame) --- */
+        .device-sim-wrapper {
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
         }
-
-        .fixture-shell {
-            display: flex;
-            width: 320px;
-            max-width: 100%;
-            min-width: 0;
+        .redmi-note-9-frame {
+            position: relative;
+            width: 851px;
+            height: 393px;
             margin: 0 auto;
-            background: #222;
-            border-radius: 12px;
+            background: #000;
+            border: 2px solid #444;
+            border-radius: 18px;
             overflow: hidden;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+        .stage-16-9 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: calc(393px * (16 / 9)); /* 698.67px */
+            height: 393px;
+            background: url("assets/bonfire.png") center / 100% 100% no-repeat;
+        }
+        /* Exact inner parchment boundary of the wooden signboard (left: 76%, top: 49.5%, w: 25%, h: 23%) */
+        .board-safe-zone {
+            position: absolute;
+            top: 49.5%;
+            left: 76%;
+            width: 25%;
+            height: 23%;
+            transform: translate(-50%, -50%) rotate(-1.25deg);
+            outline: 1.5px dashed rgba(255, 80, 80, 0.85);
+            pointer-events: none;
+            z-index: 5;
+        }
+        .stage-16-9 .screen {
+            top: 49.5%;
+            left: 76%;
+            width: 25%;
+            max-width: 25%;
+            height: 23%;
+            max-height: 23%;
+            padding: 4px 6px;
+            opacity: 1 !important;
         }
 
-        .fixture-shell--wide {
-            width: 960px;
-        }
-
-        .fixture-shell--squeezed {
-            width: 320px;
-        }
-
-        .media-frame {
-            position: relative;
-            flex: 1 1 auto;
-            min-width: 0;
-            height: 240px;
-            display: flex;
+        /* --- ISOLATED NOTICE-BOARD PROPORTION CARDS --- */
+        .grid-variants {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
             align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #2b1810 0%, #1a0f0a 100%);
         }
-
-        .fixture-shell--squeezed .media-frame {
-            flex-basis: 0;
-        }
-
-        .fixture-sibling {
-            display: none;
-            flex: 0 0 96px;
-            align-self: stretch;
-            background: rgba(255, 255, 255, 0.06);
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .fixture-shell--squeezed .fixture-sibling {
-            display: flex;
-        }
-
-        /* Override screen absolute positioning inside static stress test frames */
-        .media-frame .screen {
-            position: relative;
-            inset: auto;
-            transform: none;
-            width: 100%;
-            max-width: 100%;
-            height: 100%;
-            opacity: 1;
-            padding: 1rem 2rem;
-            background: rgba(255, 248, 238, 0.94);
+        .viewport-frame {
+            background: #0b0908;
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-        }
-
-        .controls-toolbar {
+            padding: 2.25rem 1rem 1.25rem;
+            position: relative;
             display: flex;
-            gap: 0.5rem;
+            align-items: center;
             justify-content: center;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
+        }
+        .viewport-label {
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            font-family: monospace;
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(0, 0, 0, 0.65);
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 10;
+        }
+        /* Exact Redmi Note 9 inner parchment size: 175px x 90px */
+        .board-box-phone {
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            transform: rotate(-1.25deg) !important;
+            opacity: 1 !important;
+            width: 175px !important;
+            max-width: 175px !important;
+            height: 90px !important;
+            max-height: 90px !important;
+            min-height: 0 !important;
+            padding: 4px 6px !important;
+            border-radius: 4px !important;
+            outline: 1.5px dashed rgba(255, 80, 80, 0.8);
+            background: #b5926b;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+            pointer-events: auto !important;
+        }
+        .board-box-phone.is-night {
+            --board-title-color: #ffe2c4;
+            --board-title-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 14px rgba(255, 140, 0, 0.35);
+            --board-sub-color: #dfb48c;
+            --board-sub-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+            --board-badge-bg: rgba(12, 8, 6, 0.72);
+            background: #5c432c;
         }
     </style>
 </head>
 <body data-weather="clear-day" data-time-of-day="day">
-    <main class="stress-report" aria-label="Media state stress scenarios">
-        <header class="stress-header">
-            <h1>Media State Stress Report</h1>
-            <p>Testing edge cases (long unspaced strings, 150+ char titles, missing artist/source, containers, and weather lighting) against refactored styles.</p>
-        </header>
 
-        <div class="controls-toolbar">
-            <button type="button" id="toggle-time" aria-pressed="false">Toggle Night Mode</button>
-            <button type="button" data-weather-btn="clear-day">Clear Day</button>
-            <button type="button" data-weather-btn="stormy">Stormy</button>
-            <button type="button" data-weather-btn="foggy">Foggy</button>
-        </div>
+    <div class="stress-container">
+        <h1>Bonfire Notice-Board & Media Card Stress Test</h1>
+        <p style="color: #aaa; margin-top: -1rem;">Red dashed outline = exact inner parchment boundary of the wooden signboard in the MP4 animation (25% × 23% of 16:9 stage = 175px × 90px on Redmi Note 9).</p>
 
-        <!-- Scenario 1: Typical Content -->
-        <section class="scenario-card">
-            <h2 class="scenario-label"><span>1. Typical Content · 320px container</span> <span class="badge">better-layout</span></h2>
-            <div class="fixture-shell">
-                <div class="media-frame" data-source="Spotify" data-title="Midnight City" data-artist="M83"></div>
-            </div>
-        </section>
-
-        <!-- Scenario 2: 150+ Char Title -->
-        <section class="scenario-card">
-            <h2 class="scenario-label"><span>2. 150+ Character YouTube Title · 320px container</span> <span class="badge">better-typography</span></h2>
-            <div class="fixture-shell">
-                <div class="media-frame" data-source="YouTube" data-title="A Walk Through the Moonlit City: Ambient night beats, synthwave melodies, neon lights, and quiet streets after midnight for ultimate focus and relaxation (Extended Mix)." data-artist="Tycho"></div>
-            </div>
-        </section>
-
-        <!-- Scenario 3: Squeezed by Flex Sibling with 150+ Char Title -->
-        <section class="scenario-card">
-            <h2 class="scenario-label"><span>3. 150+ Character Title · Squeezed by flex sibling</span> <span class="badge">better-layout</span></h2>
-            <div class="fixture-shell fixture-shell--squeezed">
-                <div class="media-frame" data-source="YouTube" data-title="A Walk Through the Moonlit City: Ambient night beats, synthwave melodies, neon lights, and quiet streets after midnight for ultimate focus and relaxation (Extended Mix)." data-artist="Tycho"></div>
-                <aside class="fixture-sibling" aria-hidden="true">Sidebar</aside>
-            </div>
-        </section>
-
-        <!-- Scenario 4: Wide Container -->
-        <section class="scenario-card">
-            <h2 class="scenario-label"><span>4. Typical Content · 960px Wide Container</span> <span class="badge">better-layout</span></h2>
-            <div class="fixture-shell fixture-shell--wide">
-                <div class="media-frame" data-source="Spotify" data-title="Digital Love" data-artist="Daft Punk"></div>
-            </div>
-        </section>
-
-        <!-- Scenario 5: Unbreakable Long String -->
-        <section class="scenario-card">
-            <h2 class="scenario-label"><span>5. One Unbreakable 60+ Char String · 320px container</span> <span class="badge">better-typography</span></h2>
-            <div class="fixture-shell">
-                <div class="media-frame" data-source="Vlc" data-title="Donaudampfschiffahrtsgesellschaftselectricalengineeringprototype" data-artist="Kraftwerk"></div>
-            </div>
-        </section>
-
-        <!-- Scenario 6: Missing Source & Artist -->
-        <section class="scenario-card">
-            <h2 class="scenario-label"><span>6. Missing Source Name & Missing Artist · 320px container</span> <span class="badge">better-writing</span></h2>
-            <div class="fixture-shell">
-                <div class="media-frame" data-source="" data-title="Unknown Track" data-artist=""></div>
-            </div>
-        </section>
-
-        <!-- Scenario 7: Emoji and Diacritics -->
-        <section class="scenario-card">
-            <h2 class="scenario-label"><span>7. Emoji & Diacritics (Élégance 🎧) · 320px container</span> <span class="badge">better-typography</span></h2>
-            <div class="fixture-shell">
-                <div class="media-frame" data-source="Twitch" data-title="L'été en Ville 🎧 Live Session" data-artist="Björk & Sigur Rós ✨"></div>
-            </div>
-        </section>
-
-        <!-- Scenario 8: Empty String Edge Case -->
-        <section class="scenario-card">
-            <h2 class="scenario-label"><span>8. Empty String Title & Source · 320px container</span> <span class="badge">better-writing</span></h2>
-            <div class="fixture-shell">
-                <div class="media-frame" data-source="" data-title="" data-artist=""></div>
-            </div>
-        </section>
-    </main>
-
-    <script>
-        function renderFixtures() {
-            document.querySelectorAll(".media-frame").forEach((frame) => {
-                const source = frame.dataset.source;
-                const title = frame.dataset.title;
-                const artist = frame.dataset.artist;
-
-                const sourceKey = (source || "").toLowerCase();
-                let brandClass = "brand-default";
-                if (sourceKey.includes("spotify")) brandClass = "brand-spotify";
-                else if (sourceKey.includes("youtube")) brandClass = "brand-youtube";
-                else if (sourceKey.includes("twitch")) brandClass = "brand-twitch";
-                else if (sourceKey.includes("whatsapp")) brandClass = "brand-whatsapp";
-                else if (sourceKey.includes("vlc")) brandClass = "brand-vlc";
-
-                frame.innerHTML = `
-                    <div class="screen active">
-                        <div class="media-content">
-                            <div class="source-label ${brandClass}" style="${!source ? 'display: none;' : ''}">${source}</div>
-                            <h1 class="primary-text">${title || 'Awaiting Title'}</h1>
-                            <h2 class="secondary-text">${artist || 'Unknown Artist'}</h2>
+        <!-- Section 0: Real Redmi Note 9 Scene Overlay -->
+        <div class="stress-section">
+            <h2>0. Real Scene Alignment — Xiaomi Redmi Note 9 (851×393 Landscape)</h2>
+            <p class="section-note">Tests actual placement over the wooden signboard inside a 16:9 stage centered in the phone's 19.5:9 viewport.</p>
+            <div class="device-sim-wrapper">
+                <div class="redmi-note-9-frame" data-time-of-day="night">
+                    <div class="stage-16-9">
+                        <div class="board-safe-zone" title="Inner Parchment Safe Zone"></div>
+                        <div class="screen active" style="--board-title-color: #ffe2c4; --board-title-shadow: 0 1px 3px rgba(0,0,0,0.95); --board-sub-color: #dfb48c; --board-sub-shadow: 0 1px 3px rgba(0,0,0,0.95); --board-badge-bg: rgba(12,8,6,0.72);">
+                            <div class="media-content">
+                                <div class="source-label brand-youtube">YOUTUBE</div>
+                                <h1 class="primary-text">10 Hours of Dark Souls Ambience & Rain</h1>
+                                <h2 class="secondary-text">Bonfire Soundscapes</h2>
+                            </div>
                         </div>
                     </div>
-                `;
-            });
-        }
+                </div>
+            </div>
+        </div>
 
-        renderFixtures();
+        <!-- Section 1: Exact 175x90 Parchment Bounds Stress -->
+        <div class="stress-section">
+            <h2>1. Exact Redmi Note 9 Notice-Board Bounds (175px × 90px)</h2>
+            <p class="section-note">Every media card includes its source label badge so you can verify badge truncation, contrast, and vertical height inside 90px.</p>
+            <div class="grid-variants">
 
-        document.getElementById("toggle-time").addEventListener("click", () => {
-            const isNight = document.body.dataset.timeOfDay === "night";
-            document.body.dataset.timeOfDay = isNight ? "day" : "night";
-            document.getElementById("toggle-time").setAttribute("aria-pressed", String(!isNight));
-        });
+                <!-- Spotify -->
+                <div class="viewport-frame">
+                    <span class="viewport-label">Spotify — Standard (175×90)</span>
+                    <div class="screen active board-box-phone">
+                        <div class="media-content">
+                            <div class="source-label brand-spotify">SPOTIFY</div>
+                            <h1 class="primary-text">Midnight City</h1>
+                            <h2 class="secondary-text">M83</h2>
+                        </div>
+                    </div>
+                </div>
 
-        document.querySelectorAll("[data-weather-btn]").forEach((btn) => {
-            btn.addEventListener("click", () => {
-                const weather = btn.dataset.weatherBtn;
-                document.body.dataset.weather = weather;
-            });
-        });
-    </script>
+                <!-- Twitch (Channel • Category) -->
+                <div class="viewport-frame">
+                    <span class="viewport-label">Twitch — Channel • Category</span>
+                    <div class="screen active board-box-phone is-night">
+                        <div class="media-content">
+                            <div class="source-label brand-twitch">TWITCH</div>
+                            <h1 class="primary-text">Late Night Elden Ring No-Hit Run Attempt #42</h1>
+                            <h2 class="secondary-text">LordAethelstan • Just Chatting</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Long Source Label + Long Title & Artist -->
+                <div class="viewport-frame">
+                    <span class="viewport-label">Long Source Badge + 150+ Char Title</span>
+                    <div class="screen active board-box-phone">
+                        <div class="media-content">
+                            <div class="source-label brand-default">MUSIC.YOUTUBE.COM (LONG SOURCE)</div>
+                            <h1 class="primary-text">This is an extraordinarily long track title designed specifically to test multi-line clamping and height overflow inside 90px.</h1>
+                            <h2 class="secondary-text">Featuring Collaborating Artist One, Collaborating Artist Two & Orchestra</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Long Unbroken String / URL -->
+                <div class="viewport-frame">
+                    <span class="viewport-label">Long Unbroken String / URL</span>
+                    <div class="screen active board-box-phone">
+                        <div class="media-content">
+                            <div class="source-label brand-youtube">YOUTUBE</div>
+                            <h1 class="primary-text">https://www.youtube.com/watch?v=dQw4w9WgXcQ_unbroken_string_test</h1>
+                            <h2 class="secondary-text">SuperLongUnspacedChannelName2026</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VLC Diacritics & Emojis -->
+                <div class="viewport-frame">
+                    <span class="viewport-label">VLC — Diacritics & Emojis (Night)</span>
+                    <div class="screen active board-box-phone is-night">
+                        <div class="media-content">
+                            <div class="source-label brand-vlc">VLC</div>
+                            <h1 class="primary-text">Étoile filante & Tündérkert 🚀 🎵</h1>
+                            <h2 class="secondary-text">Björk & Sigur Rós (2026)</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Windows Media Player / Default Fallback -->
+                <div class="viewport-frame">
+                    <span class="viewport-label">Media Player / Fallback Source</span>
+                    <div class="screen active board-box-phone">
+                        <div class="media-content">
+                            <div class="source-label brand-default">MEDIA PLAYER</div>
+                            <h1 class="primary-text">Ambient Soundscape</h1>
+                            <h2 class="secondary-text">Nature Recordings</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Idle State -->
+                <div class="viewport-frame">
+                    <span class="viewport-label">Idle State (175×90)</span>
+                    <div class="screen active board-box-phone is-night">
+                        <div class="idle-pulse">AWAITING TELEMETRY</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
 </body>
 </html>

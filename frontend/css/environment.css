@@ -1,0 +1,134 @@
+/* --- BACKGROUND LAYER --- */
+#background-layer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(100vw, calc(100dvh * (16 / 9)));
+    height: min(100dvh, calc(100vw * (9 / 16)));
+    z-index: -1;
+    overflow: hidden;
+}
+
+#bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    transition: opacity 0.2s ease, filter 0.8s ease;
+}
+
+#bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
+    pointer-events: none;
+}
+
+/* --- WEATHER ANIMATION LAYER --- */
+#weather-layer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(100vw, calc(100dvh * (16 / 9)));
+    height: min(100dvh, calc(100vw * (9 / 16)));
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+#weather-layer * {
+    pointer-events: none;
+}
+
+#weather-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    pointer-events: none;
+}
+
+#weather-atmosphere {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.8s ease, background 0.8s ease;
+}
+
+body[data-weather="rainy"] #bg-video {
+    filter: brightness(0.75) saturate(0.82);
+}
+
+body[data-weather="rainy"][data-time-of-day="day"] #weather-atmosphere {
+    opacity: 1;
+    background: rgba(24, 38, 58, 0.28);
+}
+
+body[data-weather="rainy"][data-time-of-day="night"] #weather-atmosphere {
+    opacity: 1;
+    background: rgba(8, 14, 24, 0.2);
+}
+
+body[data-weather="cloudy"] #bg-video {
+    filter: brightness(0.86) saturate(0.84);
+}
+
+body[data-weather="cloudy"] #weather-atmosphere {
+    opacity: 1;
+    background: linear-gradient(
+        to bottom,
+        rgba(28, 38, 54, 0.3) 0%,
+        rgba(28, 38, 54, 0.08) 55%,
+        transparent 100%
+    );
+}
+
+body[data-weather="foggy"] #bg-video {
+    filter: brightness(0.84) contrast(0.86) saturate(0.76);
+}
+
+body[data-weather="foggy"] #weather-atmosphere {
+    opacity: 1;
+    background:
+        radial-gradient(
+            circle at 50% 62%,
+            rgba(255, 175, 95, 0.09) 0%,
+            rgba(132, 160, 182, 0.17) 46%,
+            rgba(22, 34, 48, 0.46) 100%
+        ),
+        linear-gradient(
+            to top,
+            rgba(155, 180, 200, 0.24) 0%,
+            transparent 45%
+        );
+}
+
+body[data-weather="snowy"][data-time-of-day="day"] #weather-atmosphere {
+    opacity: 1;
+    background: rgba(210, 226, 245, 0.16);
+}
+
+body[data-weather="snowy"][data-time-of-day="night"] #weather-atmosphere {
+    opacity: 1;
+    background: rgba(14, 24, 42, 0.2);
+}
+
+body[data-weather="stormy"] #bg-video {
+    filter: brightness(0.68) contrast(1.06) saturate(0.75);
+}
+
+body[data-weather="stormy"] #weather-atmosphere {
+    opacity: 1;
+    background: rgba(8, 12, 22, 0.32);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #weather-layer {
+        display: none;
+    }
+}

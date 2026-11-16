@@ -18,7 +18,10 @@ def fetch_vlc_status():
     
     try:
         with urllib.request.urlopen(req, timeout=1) as response:
-            return json.loads(response.read())
+            raw_data = response.read()
+            decoded_data = raw_data.decode("utf-8", errors="replace")
+
+            return json.loads(decoded_data)
     except Exception:
         return None
 
@@ -36,6 +39,7 @@ class VLCPlugin(TelemetryPlugin):
             self._task.cancel()
 
     async def poll_vlc_state(self):
+        global vlc_currently_playing, last_vlc_title
         while True:
             vlc_data = await asyncio.to_thread(fetch_vlc_status)
             

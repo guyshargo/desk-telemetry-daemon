@@ -9,8 +9,6 @@ from core.loader import discover_and_load_plugins, start_all_plugins, stop_all_p
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Dynamically discover modules in 'producers' and mount their webhooks
-    discover_and_load_plugins(app)
     
     # start the start() method on all discovered plugins
     await start_all_plugins()
@@ -22,8 +20,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+# Load the plugins and attach routers after app creation
 discover_and_load_plugins(app)
-
 
 async def listen_for_disconnect(websocket: WebSocket):
     """Listens for the client closing the tab or Uvicorn sending a shutdown signal."""

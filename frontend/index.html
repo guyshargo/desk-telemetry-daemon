@@ -2,11 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Telemetry Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/environment.css">
+    <link rel="stylesheet" href="css/views.css">
+    <link rel="stylesheet" href="css/dev-controls.css">
 </head>
-<body data-variant="signal">
+<body data-weather="clear-day" data-time-of-day="day">
+
+    <!-- Background Layer -->
+    <div id="background-layer">
+        <video id="bg-video" autoplay muted loop playsinline poster="assets/bonfire.png">
+            <source id="bg-video-src" src="assets/bonfire_day.mp4" type="video/mp4">
+        </video>
+        <div id="bg-overlay"></div>
+    </div>
+
+    <!-- Weather Animation Layer -->
+    <div id="weather-layer" aria-hidden="true">
+        <canvas id="weather-canvas"></canvas>
+        <div id="weather-atmosphere"></div>
+    </div>
 
     <!-- Idle & Media Views -->
     <div id="base-layer">
@@ -27,23 +44,29 @@
     <div id="notification-popup" class="popup" role="status" aria-live="polite" aria-atomic="true">
         <div class="popup-content">
             <span id="notif-logo" class="notification-logo brand-whatsapp" aria-hidden="true">WA</span>
-            <h2 id="notif-title" class="primary-text popup-title" title="Alert">Alert</h2>
-            <p id="notif-body" class="secondary-text popup-body" title="Message Details">Message Details</p>
+            <div class="popup-text-group">
+                <h2 id="notif-title" class="primary-text popup-title" title="Alert">Alert</h2>
+                <p id="notif-body" class="secondary-text popup-body" title="Message Details">Message Details</p>
+            </div>
         </div>
     </div>
 
-    <nav class="state-switcher" aria-label="Mock states">
+    <nav class="weather-switcher" aria-label="Weather options" hidden>
+        <button type="button" data-weather="clear-day" aria-pressed="true">Clear Day</button>
+        <button type="button" data-weather="clear-night" aria-pressed="false">Clear Night</button>
+        <button type="button" data-weather="cloudy" aria-pressed="false">Cloudy</button>
+        <button type="button" data-weather="foggy" aria-pressed="false">Foggy</button>
+        <button type="button" data-weather="rainy" aria-pressed="false">Rainy</button>
+        <button type="button" data-weather="snowy" aria-pressed="false">Snowy</button>
+        <button type="button" data-weather="stormy" aria-pressed="false">Stormy</button>
+    </nav>
+
+    <nav class="state-switcher" aria-label="Mock states" hidden>
         <button type="button" data-state="view-idle" aria-pressed="false">Idle</button>
         <button type="button" data-state="view-media" aria-pressed="false">Media</button>
         <button type="button" data-state="notification-popup" aria-pressed="false">Notification</button>
     </nav>
 
-    <nav class="variant-picker" aria-label="Dashboard styles">
-        <button type="button" data-variant="signal" aria-pressed="true">Signal</button>
-        <button type="button" data-variant="aurora" aria-pressed="false">Aurora</button>
-        <button type="button" data-variant="pixel" aria-pressed="false">Pixel</button>
-    </nav>
-
-    <script src="app.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

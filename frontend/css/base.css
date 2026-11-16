@@ -1,0 +1,155 @@
+:root {
+    --variant-top: 49.5%;
+    --variant-left: 76.5%;
+    --variant-perspective: 380px;
+    --variant-rotate-x: 1.5deg;
+    --variant-rotate-y: -14deg;
+    --variant-rotate: -1.25deg;
+    --variant-max-width: 27%;
+    --variant-scale: 1;
+    --variant-opacity: 1;
+
+    /* Day default: dark painted ink on sunlit parchment */
+    --board-title-color: #26140c;
+    --board-title-shadow: 0 1px 0 rgba(255, 236, 208, 0.55);
+    --board-sub-color: #462819;
+    --board-sub-shadow: 0 1px 0 rgba(255, 236, 208, 0.45);
+    --board-badge-bg: rgba(28, 16, 10, 0.76);
+}
+
+body[data-time-of-day="night"] {
+    /* Night: warm firelit ink with dark grounding shadow */
+    --board-title-color: #ffe2c4;
+    --board-title-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 14px rgba(255, 140, 0, 0.35);
+    --board-sub-color: #dfb48c;
+    --board-sub-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+    --board-badge-bg: rgba(12, 8, 6, 0.72);
+}
+
+body {
+    background-color: #000;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* --- TYPOGRAPHY & BRANDING --- */
+.source-label {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-size: clamp(0.45rem, 3cqi, 0.7rem);
+    font-style: normal;
+    font-weight: 700;
+    background: var(--board-badge-bg);
+    padding: 2px 4px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    margin-top: 2px;
+    margin-bottom: 1px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+    transition-property: background-color, color;
+    transition-duration: 400ms;
+    transition-timing-function: ease;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.primary-text {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    color: var(--board-title-color);
+    text-shadow: var(--board-title-shadow);
+    font-size: clamp(0.7rem, 6cqi, 1.35rem);
+    line-height: 1.1;
+    margin: 0.1rem 0;
+    transition-property: color, text-shadow;
+    transition-duration: 400ms;
+    transition-timing-function: ease;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.secondary-text {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-weight: 600;
+    color: var(--board-sub-color);
+    text-shadow: var(--board-sub-shadow);
+    letter-spacing: 0.04em;
+    font-size: clamp(0.55rem, 4.5cqi, 0.9rem);
+    margin: 0;
+    transition-property: color, text-shadow;
+    transition-duration: 400ms;
+    transition-timing-function: ease;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.brand-spotify { color: #2ee66b; }
+.brand-youtube { color: #ff5252; }
+.brand-twitch { color: #b388ff; }
+.brand-whatsapp { color: #39e578; }
+.brand-vlc { color: #ffa033; }
+.brand-default { color: #ffad5c; }
+
+.idle-pulse {
+    color: var(--board-title-color);
+    text-shadow: var(--board-title-shadow);
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: clamp(0.75rem, 6cqi, 1.2rem);
+    font-weight: 700;
+    animation: pulse 2s infinite;
+    transition-property: color, text-shadow;
+    transition-duration: 400ms;
+    transition-timing-function: ease;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.45; }
+    50% { opacity: 1; }
+    100% { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .idle-pulse {
+        animation: none;
+        opacity: 0.85;
+    }
+}
+
+/* --- SHORT TITLE SCALING --- */
+.media-content.is-short-title .source-label {
+    font-size: clamp(0.55rem, 3.8cqi, 0.85rem);
+    padding: 3px 8px;
+}
+
+.media-content.is-short-title .primary-text {
+    font-size: clamp(0.95rem, 9cqi, 1.85rem);
+    line-height: 1.05;
+}
+
+.media-content.is-short-title .secondary-text {
+    font-size: clamp(0.7rem, 6.2cqi, 1.15rem);
+}

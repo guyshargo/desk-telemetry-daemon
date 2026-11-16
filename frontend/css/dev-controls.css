@@ -1,0 +1,75 @@
+/* --- UI CONTROLS (MOCK INTERFACE) --- */
+.weather-switcher {
+    position: fixed;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 999px;
+    z-index: 1000;
+    top: max(20px, env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.state-switcher {
+    position: fixed;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 999px;
+    z-index: 1000;
+    bottom: max(20px, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.weather-switcher[hidden],
+.state-switcher[hidden] {
+    display: none;
+}
+
+button {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    -webkit-tap-highlight-color: transparent;
+    transition-property: background-color, color, border-color, transform;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+}
+
+@media (hover: hover) {
+    button:hover {
+        color: #fff;
+        border-color: #fff;
+    }
+}
+
+button:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+button[aria-pressed="true"] {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    button {
+        transition: none !important;
+    }
+    button:active:not(:disabled) {
+        transform: none;
+    }
+}

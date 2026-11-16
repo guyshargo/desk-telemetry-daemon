@@ -27,10 +27,14 @@ export function updateMediaContent(source, title, artist) {
     const content = screen.querySelector(".media-content");
     const sourceEl = document.getElementById("media-source");
     const updateContent = () => {
+        const cleanTitle = (title || "").trim();
+
         sourceEl.innerText = source;
         sourceEl.className = `source-label ${getBrandClass(source)}`;
-        document.getElementById("media-title").innerText = title;
+        document.getElementById("media-title").innerText = cleanTitle;
         document.getElementById("media-artist").innerText = artist;
+
+        content.classList.toggle("is-short-title", cleanTitle.length > 0 && cleanTitle.length <= 18);
     };
 
     clearTimeout(mediaUpdateTimeout);

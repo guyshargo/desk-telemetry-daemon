@@ -90,6 +90,10 @@ body[data-weather="stormy"] #base-layer {
     transition-timing-function: ease-out;
 }
 
+.media-content.is-short-title {
+    gap: 0.35rem;
+}
+
 .media-content.is-changing {
     opacity: 0;
     transform: translateY(4px);

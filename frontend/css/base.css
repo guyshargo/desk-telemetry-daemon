@@ -138,3 +138,18 @@ body {
         opacity: 0.85;
     }
 }
+
+/* --- SHORT TITLE SCALING --- */
+.media-content.is-short-title .source-label {
+    font-size: clamp(0.55rem, 3.8cqi, 0.85rem);
+    padding: 3px 8px;
+}
+
+.media-content.is-short-title .primary-text {
+    font-size: clamp(0.95rem, 9cqi, 1.85rem);
+    line-height: 1.05;
+}
+
+.media-content.is-short-title .secondary-text {
+    font-size: clamp(0.7rem, 6.2cqi, 1.15rem);
+}

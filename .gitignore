@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Desk Telemetry Daemon local files
+*.lnk
+tray.log
+

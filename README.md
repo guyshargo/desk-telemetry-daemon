@@ -6,11 +6,32 @@ A modular Python WebSocket daemon and kiosk-style frontend dashboard that relays
 
 ## 🏗️ Architecture Overview
 
-```
-[ VLC Player ] ----(HTTP API)----> [ VLC Plugin ] ──┐
-                                                    │
-[ Browser / Tab ] --(Tampermonkey)--> [ Web Producer ] ──┼──> [ FastAPI Broker ] --(WebSocket)--> [ Frontend Dashboard ]
-                                                    │     (Async Queue)                         (Kiosk UI & Weather Engine)
+```mermaid
+flowchart LR
+    subgraph Sources["Media & Alert Sources"]
+        VLC["VLC Media Player"]
+        Browser["Browser Tabs<br/>(Tampermonkey)"]
+    end
+
+    subgraph Daemon["desk-telemetry-daemon (FastAPI)"]
+        VLCPlugin["VLC Plugin<br/>(HTTP Poller)"]
+        WebProd["Web Producer<br/>(POST /webhook)"]
+        Broker["Async Event Broker<br/>(Session Queue)"]
+        WS["WebSocket<br/>(/ws)"]
+    end
+
+    subgraph Display["Frontend Dashboard"]
+        UI["Kiosk UI & Notice Board"]
+        Weather["Weather & Ambient Engine<br/>(Open-Meteo)"]
+    end
+
+    VLC -- "Local HTTP API" --> VLCPlugin
+    Browser -- "JSON Webhook" --> WebProd
+    VLCPlugin --> Broker
+    WebProd --> Broker
+    Broker --> WS
+    WS -- "Live Telemetry" --> UI
+    Weather -. "Ambient Lighting & FX" .-> UI
 ```
 
 - **Backend**: Built on **FastAPI**, managing a central asynchronous event broker, dynamic plugin discovery, and a high-performance WebSocket endpoint.
@@ -37,47 +58,73 @@ A modular Python WebSocket daemon and kiosk-style frontend dashboard that relays
 - Python 3.10+
 - Modern Web Browser (Chrome, Firefox, Brave, Safari)
 
-### Installation & Setup
+### Installation & Setup (Windows Automated Workflow)
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/<username>/desk-telemetry-daemon.git
+   git clone [https://github.com/guyshargo/desk-telemetry-daemon.git](https://github.com/guyshargo/desk-telemetry-daemon.git)
    cd desk-telemetry-daemon
    ```
 
-2. **Create and activate a virtual environment:**
-   ```bash
-   python -m venv venv
-   # On Windows:
-   venv\Scripts\activate
-   # On macOS/Linux:
-   source venv/bin/activate
+2. **Run Automated Setup:**
+   Run the setup script in PowerShell (this automatically creates the `venv`, installs dependencies from `requirements.txt`, and creates a `Desk Telemetry` shortcut on your Desktop):
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\setup.ps1
    ```
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt # (or fastapi, uvicorn, etc.)
-   ```
+3. **Launch Desk Telemetry:**
+   Double-click the **Desk Telemetry** shortcut on your Desktop to run the daemon silently in the system tray (a green status icon appears near the clock—right-click it and choose **Exit** to stop the server).
 
-4. **Run the daemon:**
-   * **Terminal (Development):**
-     ```bash
-     python main.py
-     # Or via uvicorn directly:
-     uvicorn main:app --host 0.0.0.0 --port 8000
-     ```
-   * **System Tray (Background / Windows):**
-     Install tray dependencies (`pip install pystray pillow`), then run `python tray.py`—or create a Windows shortcut pointing to your virtual environment's `pythonw.exe` to launch silently with a tray icon:
-     * **Target:** `"<path-to-repo>\venv\Scripts\pythonw.exe" "<path-to-repo>\tray.py"`
-     * **Start in:** `<path-to-repo>`
-   ```
+---
 
-5. **Open the Dashboard:**
-   Navigate to `http://localhost:8000` in your browser.
+## 🔌 Setting Up Telemetry Producers
+
+### 1. Browser Media & Notifications (Tampermonkey)
+**Tampermonkey** is a free browser extension that runs lightweight JavaScript "userscripts" on websites you visit. This project uses a Tampermonkey script to read active playback metadata (YouTube, YouTube Music, Spotify Web, Twitch) and unread WhatsApp Web counts directly from your browser tabs and push them to the daemon's `POST /webhook` endpoint.
+
+1. Install the **Tampermonkey** extension in your browser.
+2. Open the Tampermonkey Dashboard → **Create a new script**.
+3. Paste the contents of the repository's browser telemetry userscript (`universal_browser_telemetry.js`) and save (`Ctrl + S`).
+4. Hard-refresh (`Ctrl + F5`) on any already-open media tabs so the script injects into them.
+
+### 2. Local Media Playback (VLC Media Player)
+The **VLC Plugin** polls VLC's built-in local HTTP API for active track titles, artists, and playback state:
+
+1. Open VLC and go to **Tools → Preferences** (`Ctrl + P`).
+2. Under **Show settings** (bottom-left), select **All**.
+3. Navigate to **Interface → Main interfaces** and check the **Web** checkbox under **Extra interface modules**.
+4. Expand **Main interfaces → Lua**, set a **Lua HTTP password** (matching your VLC plugin config), and restart VLC.
+
+---
+
+## 📱 Dedicated Kiosk Display Setup (WallPanel)
+
+To turn an old Android phone or tablet into an always-on smart desk display, use **WallPanel**—an open-source Android kiosk browser designed for full-screen dashboards, wake-lock screen control, and remote URL display.
+
+1. **Find your PC's local IP address:**
+   Run `ipconfig` in PowerShell or Command Prompt and note your **IPv4 Address** (e.g., `192.168.1.142`).
+2. **Allow Port `8000` in Windows Firewall:**
+   Ensure incoming TCP traffic on port `8000` is allowed on your local network so external devices on your Wi-Fi can reach the FastAPI server.
+3. **Configure WallPanel on your phone/tablet:**
+   * Connect the device to the **same Wi-Fi network** as your PC.
+   * Open WallPanel **Settings** (swipe inward from the left edge) → **Dashboard** → set **Dashboard URL** to `http://<YOUR-PC-IP>:8000`.
+   * Go to **Display Settings** → set **Screen Orientation** to **Landscape** (the ambient scenes and notice board are designed for widescreen displays).
+   * *(Tip)* After updating frontend CSS/JS files, tap **Clear Cache** in WallPanel Settings so Android's WebView loads the latest assets.
+
+---
+
+## 🌦️ Weather & Location Engine
+
+The dashboard automatically syncs ambient day/night themes and particle effects (rain, snow, fog, thunderstorms) with real-world local conditions:
+
+- **Weather Data (`Open-Meteo`):** Uses the free, open-source [Open-Meteo Forecast API](https://open-meteo.com/) (`api.open-meteo.com/v1/forecast`), which requires **no API key or account**. The frontend polls every 15 minutes for WMO weather codes.
+- **Location Resolution (`Browser GPS` + `GeoJS` IP Fallback):**
+  - When viewed on `localhost`, the browser requests coordinates via the standard HTML5 Geolocation API.
+  - Because mobile browsers and Android WebView block HTML5 Geolocation on non-HTTPS local network IPs (`http://192.168.x.x:8000`), the weather module automatically falls back to IP-based geolocation via [GeoJS](https://www.geojs.io/) (`get.geojs.io`) so dedicated kiosk screens still receive accurate local weather and day/night transitions without manual coordinate setup.
 
 ---
 
 ## 🛠️ Development & Testing
 
 - **Stress Scenarios**: Access `http://localhost:8000/media-state-stress.html` to test edge cases (long titles, missing artists, special characters, squeezed flex containers).
-- **Mock Controls**: Press `H` or use the built-in floating nav to toggle weather and mock view states during local development.
+- **Mock Controls**: Open `http://localhost:8000/?dev=1` or press `H` to toggle the floating weather and view-state switcher bars during local development.

@@ -1,35 +1,38 @@
 # desk-telemetry-daemon
 
-A modular Python WebSocket daemon and kiosk-style frontend dashboard that relays real-time media and notification telemetry from browser sessions and local VLC media player onto an ambient desktop interface.
+A lightweight Windows background daemon and ambient kiosk dashboard that streams live media playback, notifications, and real-world weather effects from your PC to a dedicated desk screen.
 
 ---
 
 ## 🏗️ Architecture Overview
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Sources["Media & Alert Sources"]
+        direction LR
         VLC["VLC Media Player"]
-        Browser["Browser Tabs<br/>(Tampermonkey)"]
+        Browser["Browser Tabs (Tampermonkey)"]
     end
 
     subgraph Daemon["desk-telemetry-daemon (FastAPI)"]
-        VLCPlugin["VLC Plugin<br/>(HTTP Poller)"]
-        WebProd["Web Producer<br/>(POST /webhook)"]
-        Broker["Async Event Broker<br/>(Session Queue)"]
-        WS["WebSocket<br/>(/ws)"]
+        direction LR
+        VLCPlugin["VLC Plugin"]
+        WebProd["Web Producer"]
+        Broker["Async Event Broker"]
+        WS["WebSocket (/ws)"]
+        VLCPlugin --> Broker
+        WebProd --> Broker
+        Broker --> WS
     end
 
     subgraph Display["Frontend Dashboard"]
+        direction LR
         UI["Kiosk UI & Notice Board"]
-        Weather["Weather & Ambient Engine<br/>(Open-Meteo)"]
+        Weather["Weather Engine (Open-Meteo)"]
     end
 
-    VLC -- "Local HTTP API" --> VLCPlugin
-    Browser -- "JSON Webhook" --> WebProd
-    VLCPlugin --> Broker
-    WebProd --> Broker
-    Broker --> WS
+    VLC -- "HTTP API" --> VLCPlugin
+    Browser -- "Webhook" --> WebProd
     WS -- "Live Telemetry" --> UI
     Weather -. "Ambient Lighting & FX" .-> UI
 ```

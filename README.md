@@ -61,7 +61,7 @@ flowchart TD
 - Python 3.10+
 - Modern Web Browser (Chrome, Firefox, Brave, Safari)
 
-### Installation & Setup (Windows Automated Workflow)
+### Installation & Setup
 
 1. **Clone the repository:**
    ```bash

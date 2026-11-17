@@ -8,7 +8,10 @@ router = APIRouter()
 async def receive_webhook(request: Request):
     """Catches media and notification events from Tampermonkey."""
     data = await request.json()
+    tab_id = data.get("tab_id", "default")
+
     await publish_event("web", {
+        "session_id": f"web:{tab_id}",
         "event_type": data.get("event_type", "notification"), 
         "source": data.get("source", "unknown"),
         "title": data.get("title", "New Alert"),

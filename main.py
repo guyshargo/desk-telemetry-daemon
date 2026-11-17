@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 
-from core.broker import event_queue
+from core.broker import event_queue, get_current_event, reap_stale_sessions
 from core.loader import discover_and_load_plugins, start_all_plugins, stop_all_plugins
 
 
@@ -12,9 +12,11 @@ async def lifespan(app: FastAPI):
     
     # start the start() method on all discovered plugins
     await start_all_plugins()
+    reaper_task = asyncio.create_task(reap_stale_sessions())
     
     yield  
-    
+
+    reaper_task.cancel()
     # shut down plugins on exit
     await stop_all_plugins()
 
@@ -45,6 +47,10 @@ async def websocket_endpoint(websocket: WebSocket):
     
     listen_task = asyncio.create_task(listen_for_disconnect(websocket))
     send_task = asyncio.create_task(send_telemetry_events(websocket))
+
+    current_event = get_current_event()
+    if current_event:
+        await websocket.send_json(current_event)
     
     done, pending = await asyncio.wait(
         [listen_task, send_task],

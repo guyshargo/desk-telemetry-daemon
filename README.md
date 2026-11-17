@@ -60,10 +60,16 @@ A modular Python WebSocket daemon and kiosk-style frontend dashboard that relays
    ```
 
 4. **Run the daemon:**
-   ```bash
-   python main.py
-   # Or via uvicorn directly:
-   uvicorn main:app --reload --host 0.0.0.0 --port 8000
+   * **Terminal (Development):**
+     ```bash
+     python main.py
+     # Or via uvicorn directly:
+     uvicorn main:app --host 0.0.0.0 --port 8000
+     ```
+   * **System Tray (Background / Windows):**
+     Install tray dependencies (`pip install pystray pillow`), then run `python tray.py`—or create a Windows shortcut pointing to your virtual environment's `pythonw.exe` to launch silently with a tray icon:
+     * **Target:** `"<path-to-repo>\venv\Scripts\pythonw.exe" "<path-to-repo>\tray.py"`
+     * **Start in:** `<path-to-repo>`
    ```
 
 5. **Open the Dashboard:**

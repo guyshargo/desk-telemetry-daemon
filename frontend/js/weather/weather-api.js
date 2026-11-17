@@ -1,9 +1,59 @@
 import { updateWeather } from './weather-engine.js';
 
 const WEATHER_API_URL = "https://api.open-meteo.com/v1/forecast";
-const WEATHER_REFRESH_INTERVAL = 30 * 60 * 1000; // 30 minutes
+const IP_GEO_URL = "https://get.geojs.io/v1/ip/geo.json";
+const WEATHER_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
 
 let userCoordinates = null;
+let refreshTimerId = null;
+
+function getBrowserCoordinates() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject(new Error("Geolocation is not supported by this browser."));
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => resolve({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            }),
+            (error) => reject(error),
+            {
+                enableHighAccuracy: false,
+                timeout: 5000,
+                maximumAge: 15 * 60 * 1000
+            }
+        );
+    });
+}
+
+async function getIpCoordinates() {
+    const response = await fetch(IP_GEO_URL);
+    if (!response.ok) {
+        throw new Error(`IP geolocation error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const latitude = Number(data.latitude);
+    const longitude = Number(data.longitude);
+
+    if (Number.isNaN(latitude) || Number.isNaN(longitude)) {
+        throw new Error("IP geolocation returned invalid coordinates.");
+    }
+
+    return { latitude, longitude };
+}
+
+async function resolveCoordinates() {
+    try {
+        return await getBrowserCoordinates();
+    } catch (error) {
+        console.warn("Browser geolocation unavailable, resolving via IP:", error.message);
+        return await getIpCoordinates();
+    }
+}
 
 async function fetchWeather(latitude, longitude) {
     const params = new URLSearchParams({
@@ -45,32 +95,16 @@ async function refreshWeather() {
     }
 }
 
-export function initializeWeather() {
-    if (!navigator.geolocation) {
-        console.warn("Geolocation is not supported by this browser.");
-        return;
+export async function initializeWeather() {
+    try {
+        userCoordinates = await resolveCoordinates();
+        console.log("Coordinates acquired:", userCoordinates);
+
+        await refreshWeather();
+
+        clearInterval(refreshTimerId);
+        refreshTimerId = setInterval(refreshWeather, WEATHER_REFRESH_INTERVAL);
+    } catch (error) {
+        console.error("Failed to initialize weather:", error);
     }
-
-    navigator.geolocation.getCurrentPosition(
-        async (position) => {
-            userCoordinates = {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude
-            };
-
-            console.log("User location acquired.");
-
-            await refreshWeather();
-
-            setInterval(refreshWeather, WEATHER_REFRESH_INTERVAL);
-        },
-        (error) => {
-            console.warn("Could not access user location:", error.message);
-        },
-        {
-            enableHighAccuracy: false,
-            timeout: 10000,
-            maximumAge: 30 * 60 * 1000
-        }
-    );
 }

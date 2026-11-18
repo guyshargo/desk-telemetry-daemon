@@ -2,50 +2,56 @@
 .weather-switcher {
     position: fixed;
     display: flex;
-    gap: 0.5rem;
-    padding: 0.5rem;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.4rem;
     background: rgba(0, 0, 0, 0.8);
     border-radius: 999px;
     z-index: 1000;
-    top: max(20px, env(safe-area-inset-top));
+    bottom: max(12px, env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    max-width: 96vw;
+    overflow-x: auto;
 }
 
 .state-switcher {
     position: fixed;
     display: flex;
-    gap: 0.5rem;
-    padding: 0.5rem;
+    flex-wrap: nowrap;
+    gap: 0.3rem;
+    padding: 0.3rem 0.4rem;
     background: rgba(0, 0, 0, 0.8);
     border-radius: 999px;
     z-index: 1000;
-    bottom: max(20px, env(safe-area-inset-bottom));
+    bottom: calc(max(12px, env(safe-area-inset-bottom)) + 38px);
     left: 50%;
     transform: translateX(-50%);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-}
-
-.weather-switcher[hidden],
-.state-switcher[hidden] {
-    display: none;
 }
 
 button {
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: rgba(255, 255, 255, 0.6);
-    padding: 0.4rem 0.8rem;
+    padding: 0.25rem 0.6rem;
     border-radius: 999px;
     cursor: pointer;
-    font-size: 0.75rem;
+    font-size: 0.68rem;
+    white-space: nowrap;
     -webkit-tap-highlight-color: transparent;
     transition-property: background-color, color, border-color, transform;
     transition-duration: 150ms;
     transition-timing-function: ease-out;
+}
+
+.weather-switcher[hidden],
+.state-switcher[hidden] {
+    display: none;
 }
 
 @media (hover: hover) {

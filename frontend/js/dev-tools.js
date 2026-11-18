@@ -12,10 +12,10 @@ let mediaMockIndex = 0;
 
 const mockStates = ["view-idle", "view-media", "notification-popup"];
 const mediaMockExamples = [
-    { source: "Spotify", title: "Midnight City", artist: "M83" },
-    { source: "YouTube", title: "A Walk", artist: "Tycho" },
-    { source: "Twitch", title: "Live: Just Chatting", artist: "shroud" },
-    { source: "VLC", title: "Dreams", artist: "Fleetwood Mac" }
+    { source: "Spotify", title: "Midnight City (Extended Mix)", artist: "M83 feat. Paul Son" },
+    { source: "YouTube", title: "A Walk Through the Deep Forest (Ambient Mix)", artist: "Tycho - Live at Red Rocks" },
+    { source: "Twitch", title: "Building a Distributed Telemetry Daemon with Python & FastAPI", artist: "Developer Live Stream & Q&A" },
+    { source: "VLC", title: "Dreams (Symphonic Orchestral Remaster 2024)", artist: "Fleetwood Mac & The Philharmonic" }
 ];
 
 export function isMockMode() {
